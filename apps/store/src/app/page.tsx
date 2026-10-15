@@ -174,41 +174,54 @@ export default function StoreFrontDemoPage() {
       {/* ---------------------------------------------------------------------- */}
       {/* HERO SECTION DE IDENTIDAD CÓSMICA */}
       {/* ---------------------------------------------------------------------- */}
-      <section className="relative overflow-hidden py-14 sm:py-20 border-b border-obsidian-700/60">
+      <section className="relative overflow-hidden py-10 sm:py-16 lg:py-20 border-b border-obsidian-700/60">
+        {/* Nebulosas ambientales de fondo que extienden el arte a pantallas ultra-anchas */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {/* Resplandor dorado cálido hacia la izquierda */}
+          <div className="absolute -left-20 top-1/2 -translate-y-1/2 w-[30rem] h-[30rem] bg-gold-500/10 rounded-full blur-[120px] pointer-events-none" />
+          {/* Resplandor plateado/azul hacia la derecha */}
+          <div className="absolute -right-20 top-1/2 -translate-y-1/2 w-[30rem] h-[30rem] bg-slate-400/10 rounded-full blur-[120px] pointer-events-none" />
+        </div>
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-          {/* Insignia Isotipo */}
-          <div className="inline-flex items-center justify-center mb-6">
-            <div className="relative w-16 h-16 sm:w-20 sm:h-20 drop-shadow-[0_0_20px_rgba(197,160,89,0.25)]">
+          {/* Composición Principal: Emblema Sol-Luna, Logotipo Duality Rol y Eslogan */}
+          <div className="relative mx-auto max-w-5xl rounded-2xl overflow-hidden shadow-2xl border border-gold-500/15 bg-obsidian-950">
+            {/* Imagen artística con viñeteado suave en los bordes para integración perfecta */}
+            <div className="relative w-full aspect-[1024/407]">
               <Image
-                src="/brand/logo_only.png"
-                alt="Isotipo Duality Rol"
+                src="/brand/hero_banner.png"
+                alt="Duality Rol — Forjados bajo la luz celestial, templados en la penumbra"
                 fill
                 priority
-                sizes="80px"
-                className="object-contain"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1024px"
+                className="object-contain sm:object-cover w-full h-full"
               />
+              {/* Sutil gradiente perimetral para fundir bordes con el fondo de la boutique */}
+              <div className="absolute inset-0 ring-1 ring-inset ring-gold-500/20 rounded-2xl pointer-events-none" />
             </div>
+
+            {/* Encabezado accesible para lectores de pantalla y SEO (sin duplicar visualmente el texto) */}
+            <h1 className="sr-only">
+              Duality Rol — Forjados bajo la luz celestial, templados en la penumbra
+            </h1>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif tracking-widest text-celestial-ivory uppercase max-w-4xl mx-auto leading-tight">
-            Forjados bajo la luz celestial, templados en la penumbra
-          </h1>
-
-          <p className="mt-4 sm:mt-6 text-sm sm:text-base text-celestial-silver max-w-2xl mx-auto font-light leading-relaxed">
+          {/* Subtítulo complementario y propuesta de valor */}
+          <p className="mt-6 sm:mt-8 text-xs sm:text-sm md:text-base text-celestial-silver max-w-2xl mx-auto font-light leading-relaxed">
             Accesorios de rol boutique, dados artesanales y piezas singulares impresas en 3D.
             Cada lanzamiento equilibra el día, la noche y el destino en tu mesa.
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-celestial-silver">
-            <div className="flex items-center gap-2 bg-obsidian-800/70 border border-obsidian-600 px-3.5 py-1.5 rounded-md">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs text-celestial-silver">
+            <div className="flex items-center gap-2 bg-obsidian-800/80 border border-obsidian-600 px-3.5 py-1.5 rounded-md backdrop-blur-sm">
               <MapPin className="w-3.5 h-3.5 text-gold-400" />
               <span>Retiro acordado (Argentina)</span>
             </div>
-            <div className="flex items-center gap-2 bg-obsidian-800/70 border border-obsidian-600 px-3.5 py-1.5 rounded-md">
+            <div className="flex items-center gap-2 bg-obsidian-800/80 border border-obsidian-600 px-3.5 py-1.5 rounded-md backdrop-blur-sm">
               <ShieldCheck className="w-3.5 h-3.5 text-gold-400" />
               <span>Calidad artesanal 3D & Reventa seleccionada</span>
             </div>
-            <div className="flex items-center gap-2 bg-obsidian-800/70 border border-obsidian-600 px-3.5 py-1.5 rounded-md">
+            <div className="flex items-center gap-2 bg-obsidian-800/80 border border-obsidian-600 px-3.5 py-1.5 rounded-md backdrop-blur-sm">
               <Sparkles className="w-3.5 h-3.5 text-gold-400" />
               <span>Precios en Pesos Argentinos (ARS)</span>
             </div>
