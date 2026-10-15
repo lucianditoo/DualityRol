@@ -1,0 +1,91 @@
+services:
+  # ============================================================================
+  # BASE DE DATOS POSTGRESQL
+  # ============================================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: duality_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-duality_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-duality_secure_password_dev_only}
+      POSTGRES_DB: ${DB_NAME:-duality_rol}
+    ports:
+      # En desarrollo local se expone a localhost para herramientas (Prisma Studio, DBeaver)
+      # En producción este puerto NO debe exponerse a internet.
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/init-db:/docker-entrypoint-initdb.d
+    networks:
+      - duality_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-duality_user} -d ${DB_NAME:-duality_rol}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ============================================================================
+  # TIENDA PÚBLICA (Storefront)
+  # ============================================================================
+  store:
+    build:
+      context: .
+      dockerfile: apps/store/Dockerfile
+    container_name: duality_store
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${DB_USER:-duality_user}:${DB_PASSWORD:-duality_secure_password_dev_only}@postgres:5432/${DB_NAME:-duality_rol}?schema=public
+      NEXT_PUBLIC_STORE_URL: ${NEXT_PUBLIC_STORE_URL:-http://localhost:3000}
+      MP_PUBLIC_KEY: ${MP_PUBLIC_KEY}
+      MP_ACCESS_TOKEN: ${MP_ACCESS_TOKEN}
+      MP_WEBHOOK_SECRET: ${MP_WEBHOOK_SECRET}
+      MEDIA_STORAGE_PATH: /app/uploads
+    ports:
+      - "3000:3000"
+    volumes:
+      - media_data:/app/uploads:ro # Montaje en solo lectura para la tienda
+    networks:
+      - duality_network
+
+  # ============================================================================
+  # ADMINISTRADOR COMERCIAL PRIVADO (Admin Panel)
+  # ============================================================================
+  admin:
+    build:
+      context: .
+      dockerfile: apps/admin/Dockerfile
+    container_name: duality_admin
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${DB_USER:-duality_user}:${DB_PASSWORD:-duality_secure_password_dev_only}@postgres:5432/${DB_NAME:-duality_rol}?schema=public
+      ADMIN_AUTH_SECRET: ${ADMIN_AUTH_SECRET}
+      ADMIN_SESSION_MAX_AGE_SECONDS: ${ADMIN_SESSION_MAX_AGE_SECONDS:-28800}
+      MEDIA_STORAGE_PATH: /app/uploads
+      MAX_FILE_SIZE_BYTES: ${MAX_FILE_SIZE_BYTES:-5242880}
+    ports:
+      # En producción, vincular exclusivamente a la interfaz IP de Tailscale (ej: 100.x.y.z:3001:3001)
+      - "127.0.0.1:3001:3001"
+    volumes:
+      - media_data:/app/uploads:rw # Montaje lectura y escritura para subir fotos
+    networks:
+      - duality_network
+
+networks:
+  duality_network:
+    name: duality_network
+    driver: bridge
+
+volumes:
+  postgres_data:
+    name: duality_postgres_data
+  media_data:
+    name: duality_media_data

@@ -1,0 +1,279 @@
+// ============================================================================
+// DUALITY ROL — ESQUEMA DE BASE DE DATOS (POSTGRESQL / PRISMA)
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ----------------------------------------------------------------------------
+// ENUMS
+// ----------------------------------------------------------------------------
+
+enum OrderStatus {
+  PENDING_PAYMENT   // Creado, esperando confirmación de pasarela
+  PAID              // Pago acreditado exitosamente
+  PREPARING         // En empaquetado / preparación de accesorios
+  READY_FOR_PICKUP  // Listo para retirar en el punto acordado
+  COMPLETED         // Retirado por el cliente
+  CANCELLED         // Cancelado por expiración o solicitud
+  REFUNDED          // Reintegrado
+}
+
+enum PickupStatus {
+  PENDING_COORDINATION // Esperando contacto por WhatsApp
+  COORDINATED          // Día y franja horaria acordada
+  PICKED_UP            // Retirado
+}
+
+enum StockReservationStatus {
+  ACTIVE    // Bloqueado temporalmente durante el checkout
+  CONSUMED  // Confirmado al acreditarse el pago
+  RELEASED  // Liberado manualmente o por cancelación
+  EXPIRED   // Liberado automáticamente por timeout (TTL)
+}
+
+enum AdminRole {
+  SUPERADMIN
+  OPERATOR
+}
+
+// ----------------------------------------------------------------------------
+// MODELOS DE CATÁLOGO Y PRODUCTO
+// ----------------------------------------------------------------------------
+
+model Category {
+  id           String     @id @default(cuid())
+  name         String     @db.VarChar(80)
+  slug         String     @unique @db.VarChar(90)
+  description  String?    @db.VarChar(500)
+  displayOrder Int        @default(0)
+  isActive     Boolean    @default(true)
+  
+  // Soporte de subcategorías
+  parentId     String?
+  parent       Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children     Category[] @relation("CategoryHierarchy")
+
+  products     Product[]
+
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([slug])
+  @@index([displayOrder])
+  @@index([isActive])
+}
+
+model Product {
+  id                String           @id @default(cuid())
+  name              String           @db.VarChar(120)
+  slug              String           @unique @db.VarChar(130)
+  description       String           @db.Text
+  basePriceArs      Decimal          @db.Decimal(12, 2)
+  isSelfMade        Boolean          @default(false) // Fabricación propia 3D vs Reventa
+  isDualityCreation Boolean          @default(false) // Distintivo visual especial
+  isActive          Boolean          @default(true)
+
+  categoryId        String
+  category          Category         @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  variants          ProductVariant[]
+  images            ProductImage[]
+  orderItems        OrderItem[]
+
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([isActive])
+  @@index([isDualityCreation])
+}
+
+model ProductVariant {
+  id                 String             @id @default(cuid())
+  productId          String
+  product            Product            @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  name               String             @db.VarChar(100) // Ej: "Resina Negra / Detalles Oro"
+  sku                String             @unique @db.VarChar(50)
+  priceAdjustmentArs Decimal            @default(0) @db.Decimal(12, 2)
+  stock              Int                @default(0)
+  isActive           Boolean            @default(true)
+
+  orderItems         OrderItem[]
+  stockReservations  StockReservation[]
+
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  @@index([productId])
+  @@index([sku])
+  @@index([isActive])
+}
+
+model ProductImage {
+  id           String   @id @default(cuid())
+  productId    String
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  url          String   @db.VarChar(255)
+  altText      String?  @db.VarChar(150)
+  displayOrder Int      @default(0)
+  isThumbnail  Boolean  @default(false)
+  fileSize     Int
+  mimeType     String   @db.VarChar(50)
+
+  createdAt    DateTime @default(now())
+
+  @@index([productId])
+  @@index([displayOrder])
+}
+
+// ----------------------------------------------------------------------------
+// MODELOS DE PEDIDOS Y TRANSACCIONES COMERCIALES
+// ----------------------------------------------------------------------------
+
+model Order {
+  id                  String               @id @default(cuid())
+  orderNumber         String               @unique @db.VarChar(30) // Ej: DR-2026-0001
+  status              OrderStatus          @default(PENDING_PAYMENT)
+  
+  // Datos del comprador como invitado
+  customerName        String               @db.VarChar(100)
+  customerEmail       String               @db.VarChar(120)
+  customerPhone       String               @db.VarChar(25) // WhatsApp para coordinar retiro
+  notes               String?              @db.VarChar(400)
+
+  // Importes calculados en servidor
+  subtotalArs         Decimal              @db.Decimal(12, 2)
+  totalArs            Decimal              @db.Decimal(12, 2)
+
+  // Entrega exclusiva: Retiro acordado
+  pickupCode          String               @unique @db.VarChar(20) // Código corto de seguridad para retiro
+  pickupStatus        PickupStatus         @default(PENDING_COORDINATION)
+  paidAt              DateTime?
+
+  items               OrderItem[]
+  paymentTransactions PaymentTransaction[]
+  stockReservations   StockReservation[]
+
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  @@index([orderNumber])
+  @@index([status])
+  @@index([customerEmail])
+  @@index([customerPhone])
+  @@index([pickupCode])
+}
+
+model OrderItem {
+  id           String         @id @default(cuid())
+  orderId      String
+  order        Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId    String
+  product      Product        @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  variantId    String
+  variant      ProductVariant @relation(fields: [variantId], references: [id], onDelete: Restrict)
+
+  // Fotografía histórica inmutable de los datos
+  productName  String         @db.VarChar(120)
+  variantName  String         @db.VarChar(100)
+  unitPriceArs Decimal        @db.Decimal(12, 2)
+  quantity     Int
+  subtotalArs  Decimal        @db.Decimal(12, 2)
+
+  createdAt    DateTime       @default(now())
+
+  @@index([orderId])
+  @@index([productId])
+  @@index([variantId])
+}
+
+model StockReservation {
+  id        String                 @id @default(cuid())
+  orderId   String
+  order     Order                  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  variantId String
+  variant   ProductVariant         @relation(fields: [variantId], references: [id], onDelete: Restrict)
+
+  quantity  Int
+  status    StockReservationStatus @default(ACTIVE)
+  expiresAt DateTime
+
+  createdAt DateTime               @default(now())
+  updatedAt DateTime               @updatedAt
+
+  @@index([orderId])
+  @@index([variantId])
+  @@index([status])
+  @@index([expiresAt])
+}
+
+model PaymentTransaction {
+  id                 String   @id @default(cuid())
+  orderId            String
+  order              Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  provider           String   @default("MERCADO_PAGO") @db.VarChar(30)
+  providerPaymentId  String   @unique @db.VarChar(100) // ID de pago en Mercado Pago
+  idempotencyKey     String?  @unique @db.VarChar(120)
+  status             String   @db.VarChar(50) // approved, rejected, pending, etc.
+  amountArs          Decimal  @db.Decimal(12, 2)
+  rawPayload         Json
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([providerPaymentId])
+  @@index([idempotencyKey])
+}
+
+// ----------------------------------------------------------------------------
+// MODELOS DE ADMINISTRACIÓN Y AUDITORÍA
+// ----------------------------------------------------------------------------
+
+model AdminUser {
+  id           String     @id @default(cuid())
+  email        String     @unique @db.VarChar(120)
+  passwordHash String     @db.VarChar(255)
+  role         AdminRole  @default(OPERATOR)
+  isActive     Boolean    @default(true)
+  lastLoginAt  DateTime?
+
+  auditLogs    AuditLog[]
+
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([email])
+}
+
+model AuditLog {
+  id          String     @id @default(cuid())
+  adminUserId String?
+  adminUser   AdminUser? @relation(fields: [adminUserId], references: [id], onDelete: SetNull)
+
+  action      String     @db.VarChar(100) // Ej: "PRODUCT_CREATED", "STOCK_ADJUSTED", "ORDER_STATUS_CHANGED"
+  entity      String     @db.VarChar(50)  // Ej: "Product", "Order"
+  entityId    String?    @db.VarChar(100)
+  details     Json?
+  ipAddress   String?    @db.VarChar(50)
+
+  createdAt   DateTime   @default(now())
+
+  @@index([adminUserId])
+  @@index([action])
+  @@index([entity, entityId])
+}

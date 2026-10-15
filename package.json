@@ -1,0 +1,33 @@
+{
+  "name": "duality-rol",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Duality Rol — Tienda online boutique y panel de administración",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:store": "npm run dev --workspace=apps/store",
+    "dev:admin": "npm run dev --workspace=apps/admin",
+    "build:packages": "npm run build --workspace=packages/config-contracts && npm run build --workspace=packages/database",
+    "build": "npm run build:packages && npm run build --workspaces",
+    "db:generate": "npm run db:generate --workspace=packages/database",
+    "db:migrate": "npm run db:migrate --workspace=packages/database",
+    "db:seed": "npm run db:seed --workspace=packages/database",
+    "db:studio": "npm run db:studio --workspace=packages/database",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "lint": "npm run lint --workspaces"
+  },
+  "keywords": [
+    "duality-rol",
+    "ecommerce",
+    "rpg",
+    "nextjs",
+    "prisma",
+    "tailwind"
+  ],
+  "author": "Duality Rol",
+  "license": "UNLICENSED"
+}

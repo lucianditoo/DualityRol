@@ -1,0 +1,258 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1541.266 777.6666666666666" width="1541.266" height="777.6666666666666" style="--bg:#1F1F1F;--fg:#CCCCCC;--line:#CCCCCC;--accent:#0078D4;--muted:#CCCCCCCC;--surface:#181818;--border:#CCCCCC;background:var(--bg)">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&amp;display=swap');
+  text { font-family: 'Inter', system-ui, sans-serif; }
+  .mono { font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', ui-monospace, monospace; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 85%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+</defs>
+<polyline class="er-relationship" data-entity1="Category" data-entity2="Product" data-cardinality1="one" data-cardinality2="zero-many" data-identifying="true" data-label="contiene" points="180,297.33333333333337 410.04200000000003,297.33333333333337" fill="none" stroke="var(--_line)" stroke-width="1" />
+<polyline class="er-relationship" data-entity1="Category" data-entity2="Category" data-cardinality1="one" data-cardinality2="zero-many" data-identifying="true" data-label="subcategoría de" points="86.66666666666666,269.33333333333337 86.66666666666666,259.33333333333337 133.33333333333331,259.33333333333337 133.33333333333331,269.33333333333337" fill="none" stroke="var(--_line)" stroke-width="1" />
+<polyline class="er-relationship" data-entity1="Product" data-entity2="ProductVariant" data-cardinality1="one" data-cardinality2="many" data-identifying="true" data-label="tiene" points="609.642,336 828.9920000000001,336" fill="none" stroke="var(--_line)" stroke-width="1" />
+<polyline class="er-relationship" data-entity1="Product" data-entity2="ProductImage" data-cardinality1="one" data-cardinality2="zero-many" data-identifying="true" data-label="posee" points="609.642,258.6666666666667 619.642,258.6666666666667 619.642,144 828.9920000000001,144" fill="none" stroke="var(--_line)" stroke-width="1" />
+<polyline class="er-relationship" data-entity1="Order" data-entity2="OrderItem" data-cardinality1="one" data-cardinality2="many" data-identifying="true" data-label="incluye" points="1035.192,577.3333333333334 1045.192,577.3333333333334 1045.192,483 1281.866,482.99999999999994" fill="none" stroke="var(--_line)" stroke-width="1" />
+<polyline class="er-relationship" data-entity1="ProductVariant" data-entity2="OrderItem" data-cardinality1="one" data-cardinality2="zero-many" data-identifying="true" data-label="se vende en" points="1035.192,336 1201.866,336 1201.866,464.3333333333333 1281.866,464.3333333333333" fill="none" stroke="var(--_line)" stroke-width="1" />
+<polyline class="er-relationship" data-entity1="Order" data-entity2="PaymentTransaction" data-cardinality1="one" data-cardinality2="zero-many" data-identifying="true" data-label="registra" points="1035.192,654.6666666666666 1281.866,654.6666666666666" fill="none" stroke="var(--_line)" stroke-width="1" />
+<polyline class="er-relationship" data-entity1="AdminUser" data-entity2="AuditLog" data-cardinality1="one" data-cardinality2="zero-many" data-identifying="true" data-label="genera" points="180,68 404.102,68" fill="none" stroke="var(--_line)" stroke-width="1" />
+<g class="entity" data-id="Category" data-label="Category">
+  <rect x="40" y="269.33333333333337" width="140" height="56" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="40" y="269.33333333333337" width="140" height="34" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="110" y="286.33333333333337" text-anchor="middle" font-size="13" font-weight="700" fill="var(--_text)" dy="4.55">Category</text>
+  <line x1="40" y1="303.33333333333337" x2="180" y2="303.33333333333337" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="110" y="314.33333333333337" text-anchor="middle" dy="0.35em" font-size="11" fill="var(--_text-faint)" font-style="italic">(no attributes)</text>
+</g>
+<g class="entity" data-id="Product" data-label="Product">
+  <rect x="410.04200000000003" y="181.33333333333337" width="199.6" height="232" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="410.04200000000003" y="181.33333333333337" width="199.6" height="34" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="509.84200000000004" y="198.33333333333337" text-anchor="middle" font-size="13" font-weight="700" fill="var(--_text)" dy="4.55">Product</text>
+  <line x1="410.04200000000003" y1="215.33333333333337" x2="609.642" y2="215.33333333333337" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <rect x="416.04200000000003" y="219.33333333333337" width="22.31" height="14" rx="2" ry="2" fill="var(--_key-badge)" />
+  <text x="427.197" y="226.33333333333337" text-anchor="middle" dy="0.35em" font-size="9" font-weight="600" fill="var(--_text-sec)">PK</text>
+  <text x="446.35200000000003" y="226.33333333333337" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">string</tspan></text>
+  <text x="601.642" y="226.33333333333337" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">id</tspan></text>
+  <text x="418.04200000000003" y="248.33333333333337" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">string</tspan></text>
+  <text x="601.642" y="248.33333333333337" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">name</tspan></text>
+  <rect x="416.04200000000003" y="263.33333333333337" width="22.31" height="14" rx="2" ry="2" fill="var(--_key-badge)" />
+  <text x="427.197" y="270.33333333333337" text-anchor="middle" dy="0.35em" font-size="9" font-weight="600" fill="var(--_text-sec)">UK</text>
+  <text x="446.35200000000003" y="270.33333333333337" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">string</tspan></text>
+  <text x="601.642" y="270.33333333333337" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">slug</tspan></text>
+  <text x="418.04200000000003" y="292.33333333333337" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">string</tspan></text>
+  <text x="601.642" y="292.33333333333337" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">description</tspan></text>
+  <text x="418.04200000000003" y="314.33333333333337" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">decimal</tspan></text>
+  <text x="601.642" y="314.33333333333337" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">basePriceArs</tspan></text>
+  <g><title>Fabricación propia 3D</title>
+  <text x="418.04200000000003" y="336.33333333333337" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">boolean</tspan></text>
+  <text x="601.642" y="336.33333333333337" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">isSelfMade</tspan></text>
+  </g>
+  <g><title>Etiqueta Creación Duality</title>
+  <text x="418.04200000000003" y="358.33333333333337" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">boolean</tspan></text>
+  <text x="601.642" y="358.33333333333337" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">isDualityCreation</tspan></text>
+  </g>
+  <g><title>Publicado</title>
+  <text x="418.04200000000003" y="380.33333333333337" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">boolean</tspan></text>
+  <text x="601.642" y="380.33333333333337" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">isActive</tspan></text>
+  </g>
+  <rect x="416.04200000000003" y="395.33333333333337" width="22.31" height="14" rx="2" ry="2" fill="var(--_key-badge)" />
+  <text x="427.197" y="402.33333333333337" text-anchor="middle" dy="0.35em" font-size="9" font-weight="600" fill="var(--_text-sec)">FK</text>
+  <text x="446.35200000000003" y="402.33333333333337" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">string</tspan></text>
+  <text x="601.642" y="402.33333333333337" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">categoryId</tspan></text>
+</g>
+<g class="entity" data-id="ProductVariant" data-label="ProductVariant">
+  <rect x="828.9920000000001" y="242" width="206.2" height="188" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="828.9920000000001" y="242" width="206.2" height="34" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="932.0920000000001" y="259" text-anchor="middle" font-size="13" font-weight="700" fill="var(--_text)" dy="4.55">ProductVariant</text>
+  <line x1="828.9920000000001" y1="276" x2="1035.192" y2="276" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <rect x="834.9920000000001" y="280" width="22.31" height="14" rx="2" ry="2" fill="var(--_key-badge)" />
+  <text x="846.147" y="287" text-anchor="middle" dy="0.35em" font-size="9" font-weight="600" fill="var(--_text-sec)">PK</text>
+  <text x="865.302" y="287" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">string</tspan></text>
+  <text x="1027.192" y="287" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">id</tspan></text>
+  <rect x="834.9920000000001" y="302" width="22.31" height="14" rx="2" ry="2" fill="var(--_key-badge)" />
+  <text x="846.147" y="309" text-anchor="middle" dy="0.35em" font-size="9" font-weight="600" fill="var(--_text-sec)">FK</text>
+  <text x="865.302" y="309" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">string</tspan></text>
+  <text x="1027.192" y="309" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">productId</tspan></text>
+  <g><title>Ej: Resina Negra y Oro</title>
+  <text x="836.9920000000001" y="331" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">string</tspan></text>
+  <text x="1027.192" y="331" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">name</tspan></text>
+  </g>
+  <rect x="834.9920000000001" y="346" width="22.31" height="14" rx="2" ry="2" fill="var(--_key-badge)" />
+  <text x="846.147" y="353" text-anchor="middle" dy="0.35em" font-size="9" font-weight="600" fill="var(--_text-sec)">UK</text>
+  <text x="865.302" y="353" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">string</tspan></text>
+  <text x="1027.192" y="353" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">sku</tspan></text>
+  <text x="836.9920000000001" y="375" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">decimal</tspan></text>
+  <text x="1027.192" y="375" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">priceAdjustmentArs</tspan></text>
+  <text x="836.9920000000001" y="397" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">int</tspan></text>
+  <text x="1027.192" y="397" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">stock</tspan></text>
+  <text x="836.9920000000001" y="419" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">boolean</tspan></text>
+  <text x="1027.192" y="419" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">isActive</tspan></text>
+</g>
+<g class="entity" data-id="ProductImage" data-label="ProductImage">
+  <rect x="828.9920000000001" y="116" width="140" height="56" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="828.9920000000001" y="116" width="140" height="34" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="898.9920000000001" y="133" text-anchor="middle" font-size="13" font-weight="700" fill="var(--_text)" dy="4.55">ProductImage</text>
+  <line x1="828.9920000000001" y1="150" x2="968.9920000000001" y2="150" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="898.9920000000001" y="161" text-anchor="middle" dy="0.35em" font-size="11" fill="var(--_text-faint)" font-style="italic">(no attributes)</text>
+</g>
+<g class="entity" data-id="Order" data-label="Order">
+  <rect x="855.392" y="500" width="179.79999999999998" height="232" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="855.392" y="500" width="179.79999999999998" height="34" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="945.292" y="517" text-anchor="middle" font-size="13" font-weight="700" fill="var(--_text)" dy="4.55">Order</text>
+  <line x1="855.392" y1="534" x2="1035.192" y2="534" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <rect x="861.392" y="538" width="22.31" height="14" rx="2" ry="2" fill="var(--_key-badge)" />
+  <text x="872.547" y="545" text-anchor="middle" dy="0.35em" font-size="9" font-weight="600" fill="var(--_text-sec)">PK</text>
+  <text x="891.702" y="545" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">string</tspan></text>
+  <text x="1027.192" y="545" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">id</tspan></text>
+  <g><title>Ej: #DR-2026-0001</title>
+  <rect x="861.392" y="560" width="22.31" height="14" rx="2" ry="2" fill="var(--_key-badge)" />
+  <text x="872.547" y="567" text-anchor="middle" dy="0.35em" font-size="9" font-weight="600" fill="var(--_text-sec)">UK</text>
+  <text x="891.702" y="567" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">string</tspan></text>
+  <text x="1027.192" y="567" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">orderNumber</tspan></text>
+  </g>
+  <g><title>PENDING_PAYMENT, PAID, READY_FOR_PICKUP, COMPLETED, CANCELLED</title>
+  <text x="863.392" y="589" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">enum</tspan></text>
+  <text x="1027.192" y="589" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">status</tspan></text>
+  </g>
+  <text x="863.392" y="611" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">string</tspan></text>
+  <text x="1027.192" y="611" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">customerName</tspan></text>
+  <text x="863.392" y="633" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">string</tspan></text>
+  <text x="1027.192" y="633" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">customerEmail</tspan></text>
+  <text x="863.392" y="655" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">string</tspan></text>
+  <text x="1027.192" y="655" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">customerPhone</tspan></text>
+  <text x="863.392" y="677" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">text</tspan></text>
+  <text x="1027.192" y="677" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">notes</tspan></text>
+  <text x="863.392" y="699" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">decimal</tspan></text>
+  <text x="1027.192" y="699" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">totalAmountArs</tspan></text>
+  <g><title>Código corto para retiro</title>
+  <rect x="861.392" y="714" width="22.31" height="14" rx="2" ry="2" fill="var(--_key-badge)" />
+  <text x="872.547" y="721" text-anchor="middle" dy="0.35em" font-size="9" font-weight="600" fill="var(--_text-sec)">UK</text>
+  <text x="891.702" y="721" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">string</tspan></text>
+  <text x="1027.192" y="721" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">pickupCode</tspan></text>
+  </g>
+</g>
+<g class="entity" data-id="OrderItem" data-label="OrderItem">
+  <rect x="1281.866" y="445.66666666666663" width="140" height="56" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="1281.866" y="445.66666666666663" width="140" height="34" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="1351.866" y="462.66666666666663" text-anchor="middle" font-size="13" font-weight="700" fill="var(--_text)" dy="4.55">OrderItem</text>
+  <line x1="1281.866" y1="479.66666666666663" x2="1421.866" y2="479.66666666666663" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1351.866" y="490.66666666666663" text-anchor="middle" dy="0.35em" font-size="11" fill="var(--_text-faint)" font-style="italic">(no attributes)</text>
+</g>
+<g class="entity" data-id="PaymentTransaction" data-label="PaymentTransaction">
+  <rect x="1281.866" y="571.6666666666666" width="219.4" height="166" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="1281.866" y="571.6666666666666" width="219.4" height="34" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="1391.566" y="588.6666666666666" text-anchor="middle" font-size="13" font-weight="700" fill="var(--_text)" dy="4.55">PaymentTransaction</text>
+  <line x1="1281.866" y1="605.6666666666666" x2="1501.266" y2="605.6666666666666" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <rect x="1287.866" y="609.6666666666666" width="22.31" height="14" rx="2" ry="2" fill="var(--_key-badge)" />
+  <text x="1299.021" y="616.6666666666666" text-anchor="middle" dy="0.35em" font-size="9" font-weight="600" fill="var(--_text-sec)">PK</text>
+  <text x="1318.176" y="616.6666666666666" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">string</tspan></text>
+  <text x="1493.266" y="616.6666666666666" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">id</tspan></text>
+  <rect x="1287.866" y="631.6666666666666" width="22.31" height="14" rx="2" ry="2" fill="var(--_key-badge)" />
+  <text x="1299.021" y="638.6666666666666" text-anchor="middle" dy="0.35em" font-size="9" font-weight="600" fill="var(--_text-sec)">FK</text>
+  <text x="1318.176" y="638.6666666666666" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">string</tspan></text>
+  <text x="1493.266" y="638.6666666666666" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">orderId</tspan></text>
+  <g><title>ID Mercado Pago</title>
+  <rect x="1287.866" y="653.6666666666666" width="22.31" height="14" rx="2" ry="2" fill="var(--_key-badge)" />
+  <text x="1299.021" y="660.6666666666666" text-anchor="middle" dy="0.35em" font-size="9" font-weight="600" fill="var(--_text-sec)">UK</text>
+  <text x="1318.176" y="660.6666666666666" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">string</tspan></text>
+  <text x="1493.266" y="660.6666666666666" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">providerPaymentId</tspan></text>
+  </g>
+  <g><title>approved, rejected, etc.</title>
+  <text x="1289.866" y="682.6666666666666" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">string</tspan></text>
+  <text x="1493.266" y="682.6666666666666" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">status</tspan></text>
+  </g>
+  <text x="1289.866" y="704.6666666666666" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">decimal</tspan></text>
+  <text x="1493.266" y="704.6666666666666" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">amountArs</tspan></text>
+  <text x="1289.866" y="726.6666666666666" class="mono" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-muted)">json</tspan></text>
+  <text x="1493.266" y="726.6666666666666" class="mono" text-anchor="end" dy="0.35em" font-size="11" font-weight="400"><tspan fill="var(--_text-sec)">rawPayload</tspan></text>
+</g>
+<g class="entity" data-id="AdminUser" data-label="AdminUser">
+  <rect x="40" y="40" width="140" height="56" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="40" y="40" width="140" height="34" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="110" y="57" text-anchor="middle" font-size="13" font-weight="700" fill="var(--_text)" dy="4.55">AdminUser</text>
+  <line x1="40" y1="74" x2="180" y2="74" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="110" y="85" text-anchor="middle" dy="0.35em" font-size="11" fill="var(--_text-faint)" font-style="italic">(no attributes)</text>
+</g>
+<g class="entity" data-id="AuditLog" data-label="AuditLog">
+  <rect x="404.102" y="40" width="140" height="56" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="404.102" y="40" width="140" height="34" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="474.102" y="57" text-anchor="middle" font-size="13" font-weight="700" fill="var(--_text)" dy="4.55">AuditLog</text>
+  <line x1="404.102" y1="74" x2="544.102" y2="74" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="474.102" y="85" text-anchor="middle" dy="0.35em" font-size="11" fill="var(--_text-faint)" font-style="italic">(no attributes)</text>
+</g>
+<line x1="184" y1="291.33333333333337" x2="184" y2="303.33333333333337" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="188" y1="291.33333333333337" x2="188" y2="303.33333333333337" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="406.04200000000003" y1="304.33333333333337" x2="394.04200000000003" y2="297.33333333333337" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="406.04200000000003" y1="297.33333333333337" x2="394.04200000000003" y2="297.33333333333337" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="406.04200000000003" y1="290.33333333333337" x2="394.04200000000003" y2="297.33333333333337" stroke="var(--_line)" stroke-width="1.25" />
+<circle cx="390.04200000000003" cy="297.33333333333337" r="4" fill="var(--bg)" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="80.66666666666666" y1="265.33333333333337" x2="92.66666666666666" y2="265.33333333333337" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="80.66666666666666" y1="261.33333333333337" x2="92.66666666666666" y2="261.33333333333337" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="126.33333333333331" y1="265.33333333333337" x2="133.33333333333331" y2="253.33333333333337" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="133.33333333333331" y1="265.33333333333337" x2="133.33333333333331" y2="253.33333333333337" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="140.33333333333331" y1="265.33333333333337" x2="133.33333333333331" y2="253.33333333333337" stroke="var(--_line)" stroke-width="1.25" />
+<circle cx="133.33333333333331" cy="249.33333333333337" r="4" fill="var(--bg)" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="613.642" y1="330" x2="613.642" y2="342" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="617.642" y1="330" x2="617.642" y2="342" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="824.9920000000001" y1="343" x2="812.9920000000001" y2="336" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="824.9920000000001" y1="336" x2="812.9920000000001" y2="336" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="824.9920000000001" y1="329" x2="812.9920000000001" y2="336" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="613.642" y1="252.66666666666669" x2="613.642" y2="264.6666666666667" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="617.642" y1="252.66666666666669" x2="617.642" y2="264.6666666666667" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="824.9920000000001" y1="151" x2="812.9920000000001" y2="144" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="824.9920000000001" y1="144" x2="812.9920000000001" y2="144" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="824.9920000000001" y1="137" x2="812.9920000000001" y2="144" stroke="var(--_line)" stroke-width="1.25" />
+<circle cx="808.9920000000001" cy="144" r="4" fill="var(--bg)" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="1039.192" y1="571.3333333333334" x2="1039.192" y2="583.3333333333334" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="1043.192" y1="571.3333333333334" x2="1043.192" y2="583.3333333333334" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="1277.866" y1="489.99999999999994" x2="1265.866" y2="482.99999999999994" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="1277.866" y1="482.99999999999994" x2="1265.866" y2="482.99999999999994" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="1277.866" y1="475.99999999999994" x2="1265.866" y2="482.99999999999994" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="1039.192" y1="330" x2="1039.192" y2="342" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="1043.192" y1="330" x2="1043.192" y2="342" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="1277.866" y1="471.3333333333333" x2="1265.866" y2="464.3333333333333" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="1277.866" y1="464.3333333333333" x2="1265.866" y2="464.3333333333333" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="1277.866" y1="457.3333333333333" x2="1265.866" y2="464.3333333333333" stroke="var(--_line)" stroke-width="1.25" />
+<circle cx="1261.866" cy="464.3333333333333" r="4" fill="var(--bg)" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="1039.192" y1="648.6666666666666" x2="1039.192" y2="660.6666666666666" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="1043.192" y1="648.6666666666666" x2="1043.192" y2="660.6666666666666" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="1277.866" y1="661.6666666666666" x2="1265.866" y2="654.6666666666666" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="1277.866" y1="654.6666666666666" x2="1265.866" y2="654.6666666666666" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="1277.866" y1="647.6666666666666" x2="1265.866" y2="654.6666666666666" stroke="var(--_line)" stroke-width="1.25" />
+<circle cx="1261.866" cy="654.6666666666666" r="4" fill="var(--bg)" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="184" y1="62" x2="184" y2="74" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="188" y1="62" x2="188" y2="74" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="400.102" y1="75" x2="388.102" y2="68" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="400.102" y1="68" x2="388.102" y2="68" stroke="var(--_line)" stroke-width="1.25" />
+<line x1="400.102" y1="61" x2="388.102" y2="68" stroke="var(--_line)" stroke-width="1.25" />
+<circle cx="384.102" cy="68" r="4" fill="var(--bg)" stroke="var(--_line)" stroke-width="1.25" />
+<rect x="270" y="287.1833333333334" width="50.042" height="20.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="295.021" y="297.33333333333337" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">contiene</text>
+<rect x="65.07999999999997" y="249.18333333333337" width="89.84000000000003" height="20.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="109.99999999999999" y="259.33333333333337" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">subcategoría de</text>
+<rect x="703.206" y="325.85" width="32.221999999999994" height="20.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="719.317" y="336" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">tiene</text>
+<rect x="642.3086666666668" y="133.85" width="39.35" height="20.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="661.9836666666667" y="144" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">posee</text>
+<rect x="1089.3113333333333" y="472.85" width="44.102" height="20.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="1111.3623333333333" y="483" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">incluye</text>
+<rect x="1168.529" y="346.67966666666666" width="66.674" height="20.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="1201.866" y="356.82966666666664" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">se vende en</text>
+<rect x="1134.696" y="644.5166666666667" width="47.666" height="20.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="1158.529" y="654.6666666666666" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">registra</text>
+<rect x="270" y="57.85" width="44.102" height="20.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="292.051" y="68" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">genera</text>
+</svg>

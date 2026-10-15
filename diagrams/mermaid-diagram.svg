@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 788.9029166666667 886.5000000000001" width="788.9029166666667" height="886.5000000000001" style="--bg:#1F1F1F;--fg:#CCCCCC;--line:#CCCCCC;--accent:#0078D4;--muted:#CCCCCCCC;--surface:#181818;--border:#CCCCCC;background:var(--bg)">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Inter', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 85%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="5" refX="7" refY="2.5" orient="auto">
+    <polygon points="0 0, 8 2.5, 0 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+  <marker id="arrowhead-start" markerWidth="8" markerHeight="5" refX="1" refY="2.5" orient="auto-start-reverse">
+    <polygon points="8 0, 0 2.5, 8 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+</defs>
+<g class="subgraph" data-id="Internet" data-label="Acceso Público (Internet)">
+  <rect x="278.651" y="208.9" width="219.92699999999996" height="181.8" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="278.651" y="208.9" width="219.92699999999996" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="290.651" y="222.9" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">Acceso Público (Internet)</text>
+</g>
+<g class="subgraph" data-id="PrivateNet" data-label="Acceso Privado (Solo Tailscale)">
+  <rect x="526.578" y="208.9" width="218.44499999999996" height="181.8" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="526.578" y="208.9" width="218.44499999999996" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="538.578" y="222.9" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">Acceso Privado (Solo Tailscale)</text>
+</g>
+<g class="subgraph" data-id="DockerHost" data-label="Servidor / Docker Host">
+  <rect x="232.88391666666664" y="450.70000000000005" width="516.019" height="369.8" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="232.88391666666664" y="450.70000000000005" width="516.019" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="244.88391666666664" y="464.70000000000005" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">Servidor / Docker Host</text>
+<g class="subgraph" data-id="Apps" data-label="Aplicaciones Web Independientes">
+  <rect x="248.88391666666664" y="500.70000000000005" width="484.01899999999995" height="96.9" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="248.88391666666664" y="500.70000000000005" width="484.01899999999995" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="260.88391666666666" y="514.7" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">Aplicaciones Web Independientes</text>
+</g>
+<g class="subgraph" data-id="Storage" data-label="Almacenamiento e Integraciones">
+  <rect x="262.5349166666667" y="657.6" width="467.71699999999987" height="146.9" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="262.5349166666667" y="657.6" width="467.71699999999987" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="274.5349166666667" y="671.6" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">Almacenamiento e Integraciones</text>
+</g>
+</g>
+<g class="subgraph" data-id="External" data-label="Pasarela de Pagos">
+  <rect x="50.04" y="58" width="322.92599999999993" height="96.9" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="50.04" y="58" width="322.92599999999993" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="62.04" y="72" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">Pasarela de Pagos</text>
+</g>
+<polyline class="edge" data-from="CF" data-to="StoreApp" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="388.6144999999999,374.70000000000005 388.61449999999996,432.70000000000005 384.73458333333326,432.70000000000005 384.73458333333326,544.7" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="TS" data-to="AdminApp" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="635.8004999999999,374.70000000000005 635.8004999999999,432.70000000000005 594.7814166666666,432.70000000000005 594.7814166666666,544.7" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="StoreApp" data-to="PG" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="354.77191666666664,581.6 354.77191666666664,645.6 371.75741666666664,645.6 371.75741666666664,737.6" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="AdminApp" data-to="PG" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="594.7814166666666,581.6 594.7814166666666,645.6 371.75741666666664,645.6 371.75741666666664,737.6" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="AdminApp" data-to="MediaVol" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="594.7814166666666,581.6 594.7814166666666,645.6 603.6159166666666,645.6 603.6159166666666,737.6" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="StoreApp" data-to="MediaVol" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="354.77191666666664,581.6 354.77191666666664,645.6 603.6159166666666,645.6 603.6159166666666,737.6" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="StoreApp" data-to="MP" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="309.8279166666666,581.6 309.8279166666666,615.6000000000001 251.5349166666667,615.6000000000001 251.5349166666667,838.5000000000001 40.04000000000002,838.5000000000001 40.04000000000002,40.000000000000114 211.503,40.000000000000114 211.503,102" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="MP" data-to="StoreApp" data-style="dotted" data-arrow-start="false" data-arrow-end="true" data-label="Webhooks /ipn" points="211.50299999999996,138.9 211.50299999999996,432.70000000000005 324.80925,432.70000000000005 324.8092499999999,544.7" fill="none" stroke="var(--_line)" stroke-width="1" stroke-dasharray="4 4" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Client" data-to="CF" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="388.6145,289.8 388.6145,337.8" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="AdminUser" data-to="TS" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="635.8004999999999,289.8 635.8004999999999,337.8" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<g class="edge-label" data-from="MP" data-to="StoreApp" data-label="Webhooks /ipn">
+  <rect x="167.50299999999996" y="371.4" width="87.14800000000002" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="211.07699999999997" y="386.54999999999995" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Webhooks /ipn</text>
+</g>
+<g class="node" data-id="Client" data-label="Clientes (Móvil / Desktop)" data-shape="rectangle">
+  <rect x="294.651" y="252.9" width="187.92699999999996" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="388.6145" y="271.35" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Clientes (Móvil / Desktop)</text>
+</g>
+<g class="node" data-id="CF" data-label="Cloudflare Tunnel" data-shape="rectangle">
+  <rect x="315.399" y="337.8" width="146.43099999999998" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="388.6145" y="356.25" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Cloudflare Tunnel</text>
+</g>
+<g class="node" data-id="AdminUser" data-label="Administrador Comercial" data-shape="rectangle">
+  <rect x="542.578" y="252.9" width="186.44499999999996" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="635.8004999999999" y="271.35" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Administrador Comercial</text>
+</g>
+<g class="node" data-id="TS" data-label="Tailscale Serve / Node" data-shape="rectangle">
+  <rect x="548.1355" y="337.8" width="175.32999999999998" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="635.8004999999999" y="356.25" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Tailscale Serve / Node</text>
+</g>
+<g class="node" data-id="StoreApp" data-label="Tienda Pública (Next.js)" data-shape="rectangle">
+  <rect x="264.88391666666666" y="544.7" width="179.77599999999995" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="354.77191666666664" y="563.1500000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Tienda Pública (Next.js)</text>
+</g>
+<g class="node" data-id="AdminApp" data-label="Panel Admin (Next.js + Auth Propia)" data-shape="rectangle">
+  <rect x="472.6599166666666" y="544.7" width="244.243" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="594.7814166666666" y="563.1500000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Panel Admin (Next.js + Auth Propia)</text>
+</g>
+<g class="node" data-id="PG" data-label="PostgreSQL Persistente" data-shape="cylinder">
+  <rect x="278.5349166666667" y="744.6" width="186.44499999999994" height="36.900000000000006" fill="var(--_node-fill)" stroke="none" />
+  <line x1="278.5349166666667" y1="744.6" x2="278.5349166666667" y2="781.5" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <line x1="464.9799166666666" y1="744.6" x2="464.9799166666666" y2="781.5" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="371.75741666666664" cy="781.5" rx="93.22249999999997" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="371.75741666666664" cy="744.6" rx="93.22249999999997" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="371.75741666666664" y="763.0500000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">PostgreSQL Persistente</text>
+</g>
+<g class="node" data-id="MediaVol" data-label="Volumen de Medios (Imágenes)" data-shape="rectangle">
+  <rect x="492.9799166666666" y="737.6" width="221.27199999999996" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="603.6159166666666" y="756.0500000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Volumen de Medios (Imágenes)</text>
+</g>
+<g class="node" data-id="MP" data-label="Mercado Pago (Checkout Pro / Webhooks)" data-shape="rectangle">
+  <rect x="66.03999999999999" y="102" width="290.92599999999993" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="211.50299999999996" y="120.45" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Mercado Pago (Checkout Pro / Webhooks)</text>
+</g>
+</svg>
