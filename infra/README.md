@@ -84,3 +84,17 @@ chmod +x ./infra/restore.sh
 ./infra/restore.sh ./backups/duality_db_20261015_120000.sql.gz ./backups/duality_media_20261015_120000.tar.gz
 ```
 El script solicitará confirmación interactiva para evitar sobrescrituras accidentales.
+
+---
+
+## 6. Tareas Pendientes de Infraestructura
+
+Las siguientes tareas se encuentran registradas para completarse en las fases correspondientes:
+
+1. **Separación de privilegios de PostgreSQL entre aplicaciones:**
+   - Crear roles dedicados de base de datos (`store_user` con permisos restringidos de solo lectura en catálogo e inserción controlada de órdenes vs. `admin_user` con permisos completos para ABM).
+2. **Aislamiento del Administrador en producción:**
+   - Configuración y verificación de `Tailscale Serve` vinculando `duality_admin` exclusivamente a la IP 100.x de Tailscale, garantizando que el panel nunca quede expuesto fuera de la red privada ni sea ruteado por Cloudflare.
+3. **Compilación de Contenedores Docker:**
+   - Finalizar la compilación y prueba de las imágenes Docker completas de `apps/store` y `apps/admin` una vez concluidas las aplicaciones funcionales definitivas.
+
