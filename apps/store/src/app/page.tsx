@@ -172,29 +172,29 @@ export default function StoreFrontDemoPage() {
       </header>
 
       {/* ---------------------------------------------------------------------- */}
-      {/* HERO SECTION DE IDENTIDAD CÓSMICA (BANNER PANORÁMICO FULL-WIDTH) */}
+      {/* HERO SECTION DE IDENTIDAD CÓSMICA (BANNER CINEMATOGRÁFICO FULL-WIDTH) */}
       {/* ---------------------------------------------------------------------- */}
-      <section className="relative overflow-hidden border-b border-obsidian-700/60 bg-obsidian-950">
-        {/* Nebulosas ambientales sutiles para pantallas ultra-anchas */}
+      <section className="relative w-full overflow-hidden border-b border-obsidian-700/60 bg-obsidian-950">
+        {/* Nebulosas ambientales para pantallas ultra-anchas */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute -left-24 top-1/4 w-[35rem] h-[35rem] bg-gold-500/10 rounded-full blur-[140px] pointer-events-none" />
-          <div className="absolute -right-24 top-1/4 w-[35rem] h-[35rem] bg-slate-400/10 rounded-full blur-[140px] pointer-events-none" />
+          <div className="absolute -left-28 top-1/3 w-[35rem] h-[35rem] bg-gold-500/10 rounded-full blur-[140px] pointer-events-none" />
+          <div className="absolute -right-28 top-1/3 w-[35rem] h-[35rem] bg-slate-400/10 rounded-full blur-[140px] pointer-events-none" />
         </div>
 
-        {/* 1. BANNER PANORÁMICO DE ANCHO COMPLETO (100% VIEWPORT WIDTH, SIN BORDES NI MÁRGENES) */}
-        <div className="relative w-full overflow-hidden">
+        {/* 1. BANNER CINEMATOGRÁFICO DE ANCHO COMPLETO (100% VIEWPORT WIDTH, SIN MÁRGENES NI BORDES) */}
+        <div className="relative w-full overflow-hidden bg-black">
           <Image
-            src="/brand/hero_banner.png"
+            src="/brand/hero_cinematic.webp"
             alt="Duality Rol — Forjados bajo la luz celestial, templados en la penumbra"
             width={1024}
-            height={407}
+            height={292}
             priority
             sizes="100vw"
             className="w-full h-auto block select-none"
           />
 
-          {/* Difuminado perimetral inferior para fundir el banner con el fondo de la página */}
-          <div className="absolute inset-x-0 bottom-0 h-12 sm:h-20 md:h-28 bg-gradient-to-t from-obsidian-900 via-obsidian-900/50 to-transparent pointer-events-none" />
+          {/* Difuminado suave inferior para fundir con el fondo obsidiana de la página */}
+          <div className="absolute inset-x-0 bottom-0 h-10 sm:h-16 md:h-24 bg-gradient-to-t from-obsidian-900 via-obsidian-900/40 to-transparent pointer-events-none" />
 
           {/* Encabezado accesible para SEO y lectores de pantalla (sin duplicar texto visualmente) */}
           <h1 className="sr-only">
@@ -203,7 +203,7 @@ export default function StoreFrontDemoPage() {
         </div>
 
         {/* 2. TEXTO DESCRIPTIVO E INSIGNIAS INFORMATIVAS (CONTENIDO CENTRADO INFERIOR) */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center pt-4 sm:pt-6 pb-10 sm:pb-14">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center pt-5 sm:pt-7 pb-10 sm:pb-12">
           <p className="text-xs sm:text-sm md:text-base text-celestial-silver max-w-2xl mx-auto font-light leading-relaxed">
             Accesorios de rol boutique, dados artesanales y piezas singulares impresas en 3D.
             Cada lanzamiento equilibra el día, la noche y el destino en tu mesa.
