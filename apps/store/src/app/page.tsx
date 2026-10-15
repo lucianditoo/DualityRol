@@ -172,47 +172,44 @@ export default function StoreFrontDemoPage() {
       </header>
 
       {/* ---------------------------------------------------------------------- */}
-      {/* HERO SECTION DE IDENTIDAD CÓSMICA */}
+      {/* HERO SECTION DE IDENTIDAD CÓSMICA (BANNER PANORÁMICO FULL-WIDTH) */}
       {/* ---------------------------------------------------------------------- */}
-      <section className="relative overflow-hidden py-10 sm:py-16 lg:py-20 border-b border-obsidian-700/60">
-        {/* Nebulosas ambientales de fondo que extienden el arte a pantallas ultra-anchas */}
+      <section className="relative overflow-hidden border-b border-obsidian-700/60 bg-obsidian-950">
+        {/* Nebulosas ambientales sutiles para pantallas ultra-anchas */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {/* Resplandor dorado cálido hacia la izquierda */}
-          <div className="absolute -left-20 top-1/2 -translate-y-1/2 w-[30rem] h-[30rem] bg-gold-500/10 rounded-full blur-[120px] pointer-events-none" />
-          {/* Resplandor plateado/azul hacia la derecha */}
-          <div className="absolute -right-20 top-1/2 -translate-y-1/2 w-[30rem] h-[30rem] bg-slate-400/10 rounded-full blur-[120px] pointer-events-none" />
+          <div className="absolute -left-24 top-1/4 w-[35rem] h-[35rem] bg-gold-500/10 rounded-full blur-[140px] pointer-events-none" />
+          <div className="absolute -right-24 top-1/4 w-[35rem] h-[35rem] bg-slate-400/10 rounded-full blur-[140px] pointer-events-none" />
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-          {/* Composición Principal: Emblema Sol-Luna, Logotipo Duality Rol y Eslogan */}
-          <div className="relative mx-auto max-w-5xl rounded-2xl overflow-hidden shadow-2xl border border-gold-500/15 bg-obsidian-950">
-            {/* Imagen artística con viñeteado suave en los bordes para integración perfecta */}
-            <div className="relative w-full aspect-[1024/407]">
-              <Image
-                src="/brand/hero_banner.png"
-                alt="Duality Rol — Forjados bajo la luz celestial, templados en la penumbra"
-                fill
-                priority
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1024px"
-                className="object-contain sm:object-cover w-full h-full"
-              />
-              {/* Sutil gradiente perimetral para fundir bordes con el fondo de la boutique */}
-              <div className="absolute inset-0 ring-1 ring-inset ring-gold-500/20 rounded-2xl pointer-events-none" />
-            </div>
+        {/* 1. BANNER PANORÁMICO DE ANCHO COMPLETO (100% VIEWPORT WIDTH, SIN BORDES NI MÁRGENES) */}
+        <div className="relative w-full overflow-hidden">
+          <Image
+            src="/brand/hero_banner.png"
+            alt="Duality Rol — Forjados bajo la luz celestial, templados en la penumbra"
+            width={1024}
+            height={407}
+            priority
+            sizes="100vw"
+            className="w-full h-auto block select-none"
+          />
 
-            {/* Encabezado accesible para lectores de pantalla y SEO (sin duplicar visualmente el texto) */}
-            <h1 className="sr-only">
-              Duality Rol — Forjados bajo la luz celestial, templados en la penumbra
-            </h1>
-          </div>
+          {/* Difuminado perimetral inferior para fundir el banner con el fondo de la página */}
+          <div className="absolute inset-x-0 bottom-0 h-12 sm:h-20 md:h-28 bg-gradient-to-t from-obsidian-900 via-obsidian-900/50 to-transparent pointer-events-none" />
 
-          {/* Subtítulo complementario y propuesta de valor */}
-          <p className="mt-6 sm:mt-8 text-xs sm:text-sm md:text-base text-celestial-silver max-w-2xl mx-auto font-light leading-relaxed">
+          {/* Encabezado accesible para SEO y lectores de pantalla (sin duplicar texto visualmente) */}
+          <h1 className="sr-only">
+            Duality Rol — Forjados bajo la luz celestial, templados en la penumbra
+          </h1>
+        </div>
+
+        {/* 2. TEXTO DESCRIPTIVO E INSIGNIAS INFORMATIVAS (CONTENIDO CENTRADO INFERIOR) */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center pt-4 sm:pt-6 pb-10 sm:pb-14">
+          <p className="text-xs sm:text-sm md:text-base text-celestial-silver max-w-2xl mx-auto font-light leading-relaxed">
             Accesorios de rol boutique, dados artesanales y piezas singulares impresas en 3D.
             Cada lanzamiento equilibra el día, la noche y el destino en tu mesa.
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs text-celestial-silver">
+          <div className="mt-6 sm:mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs text-celestial-silver">
             <div className="flex items-center gap-2 bg-obsidian-800/80 border border-obsidian-600 px-3.5 py-1.5 rounded-md backdrop-blur-sm">
               <MapPin className="w-3.5 h-3.5 text-gold-400" />
               <span>Retiro acordado (Argentina)</span>
