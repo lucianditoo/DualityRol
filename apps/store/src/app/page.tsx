@@ -181,25 +181,57 @@ export default function StoreFrontDemoPage() {
           <div className="absolute -right-28 top-1/3 w-[35rem] h-[35rem] bg-slate-400/10 rounded-full blur-[140px] pointer-events-none" />
         </div>
 
-        {/* 1. BANNER CINEMATOGRÁFICO DE ANCHO COMPLETO (100% VIEWPORT WIDTH, SIN MÁRGENES NI BORDES) */}
-        <div className="relative w-full overflow-hidden bg-black">
+        {/* 1. COMPOSICIÓN MULTI-CAPA DEL BANNER HERO (FONDO COMFYUI + LOGO TRANSPARENTE + ESLOGAN HTML) */}
+        <div className="relative w-full aspect-[1024/400] overflow-hidden bg-black select-none">
+          {/* Capa 1: Fondo generado con ComfyUI (100% fiel, sin alterar) */}
           <Image
-            src="/brand/hero_cinematic.webp"
-            alt="Duality Rol — Forjados bajo la luz celestial, templados en la penumbra"
-            width={1024}
-            height={292}
+            src="/brand/hero_bg.webp"
+            alt="Fondo Cósmico Celestial Duality Rol"
+            fill
             priority
             sizes="100vw"
-            className="w-full h-auto block select-none"
+            className="w-full h-full object-cover pointer-events-none"
           />
 
-          {/* Difuminado suave inferior para fundir con el fondo obsidiana de la página */}
-          <div className="absolute inset-x-0 bottom-0 h-10 sm:h-16 md:h-24 bg-gradient-to-t from-obsidian-900 via-obsidian-900/40 to-transparent pointer-events-none" />
+          {/* Capa 2: Emblema y Logotipo Duality Rol (Superpuesto con alineación exacta al montaje) */}
+          <div className="absolute left-[47.15%] top-[19.1%] w-[39.2%] aspect-[1024/512] -translate-x-1/2 pointer-events-none drop-shadow-[0_4px_25px_rgba(0,0,0,0.85)]">
+            <Image
+              src="/brand/hero_logo.webp"
+              alt="Duality Rol — Emblema Sol y Luna"
+              fill
+              priority
+              sizes="(max-width: 768px) 45vw, 402px"
+              className="w-full h-full object-contain pointer-events-none"
+            />
+          </div>
 
-          {/* Encabezado accesible para SEO y lectores de pantalla (sin duplicar texto visualmente) */}
-          <h1 className="sr-only">
-            Duality Rol — Forjados bajo la luz celestial, templados en la penumbra
-          </h1>
+          {/* Capa 3: Eslogan en dos líneas como texto HTML independiente */}
+          <div className="absolute left-[47.15%] top-[71.5%] -translate-x-1/2 w-[92%] sm:w-[75%] md:w-[60%] lg:w-[50%] text-center pointer-events-none flex flex-col items-center">
+            <h1 className="flex flex-col items-center gap-0.5 sm:gap-1 md:gap-1.5 font-serif leading-none">
+              <span className="text-[8px] min-[360px]:text-[10px] min-[480px]:text-xs sm:text-sm md:text-base lg:text-[17px] tracking-[0.22em] min-[360px]:tracking-[0.26em] sm:tracking-[0.28em] text-celestial-ivory font-medium uppercase drop-shadow-[0_2px_10px_rgba(0,0,0,0.95)]">
+                Forjados bajo la luz celestial
+              </span>
+              <span className="text-[7px] min-[360px]:text-[9px] min-[480px]:text-[11px] sm:text-xs md:text-[13px] lg:text-[15px] tracking-[0.26em] min-[360px]:tracking-[0.3em] sm:tracking-[0.32em] text-gold-400 font-medium uppercase drop-shadow-[0_2px_10px_rgba(0,0,0,0.95)] mt-0.5 sm:mt-1">
+                Templados en la penumbra
+              </span>
+            </h1>
+
+            {/* Ornamento diamante celestial estilizado */}
+            <div className="mt-1 sm:mt-1.5 md:mt-2 opacity-80 flex items-center justify-center">
+              <svg
+                className="w-14 min-[360px]:w-18 min-[480px]:w-24 sm:w-32 md:w-40 h-1.5 sm:h-2 text-gold-400"
+                viewBox="0 0 100 8"
+                fill="none"
+              >
+                <line x1="0" y1="4" x2="42" y2="4" stroke="currentColor" strokeWidth="0.6" strokeOpacity="0.5" />
+                <polygon points="50,1 53,4 50,7 47,4" fill="currentColor" />
+                <line x1="58" y1="4" x2="100" y2="4" stroke="currentColor" strokeWidth="0.6" strokeOpacity="0.5" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Difuminado perimetral inferior para fundir con el fondo obsidiana de la página */}
+          <div className="absolute inset-x-0 bottom-0 h-6 sm:h-12 md:h-18 bg-gradient-to-t from-obsidian-900 via-obsidian-900/35 to-transparent pointer-events-none" />
         </div>
 
         {/* 2. TEXTO DESCRIPTIVO E INSIGNIAS INFORMATIVAS (CONTENIDO CENTRADO INFERIOR) */}
