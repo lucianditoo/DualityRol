@@ -112,16 +112,16 @@ export default function StoreFrontDemoPage() {
       {/* ---------------------------------------------------------------------- */}
       <header className="sticky top-0 z-40 bg-obsidian-900/90 backdrop-blur-md border-b border-obsidian-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
-          {/* LOGOTIPO ORIGINAL */}
+          {/* EMBLEMA DORADO ENCABEZADO */}
           <div className="flex items-center gap-3">
-            <div className="relative h-12 w-48 sm:w-56 cursor-pointer">
+            <div className="relative h-11 w-11 sm:h-[52px] sm:w-[52px] cursor-pointer flex-shrink-0">
               <Image
-                src="/brand/logo_name.png"
+                src="/brand/dualidad_emblema.webp"
                 alt="Duality Rol"
                 fill
                 priority
-                sizes="(max-width: 640px) 192px, 224px"
-                className="object-contain object-left"
+                sizes="(max-width: 640px) 44px, 52px"
+                className="object-contain"
               />
             </div>
           </div>
@@ -196,38 +196,38 @@ export default function StoreFrontDemoPage() {
           {/* CONTENEDOR COMÚN CENTRADO PARA TODO EL CONJUNTO VISUAL (Logo + Eslogan + Adorno) */}
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10 px-4">
             <div className="flex flex-col items-center justify-center w-[88%] sm:w-[70%] md:w-[54%] lg:w-[46%] xl:w-[41%] translate-y-[1.5%] sm:translate-y-[2%]">
-              {/* Capa 2: Emblema y Logotipo Duality Rol (Perfectamente equilibrado sobre el agujero negro) */}
-              <div className="relative w-full aspect-[1024/512] drop-shadow-[0_4px_30px_rgba(0,0,0,0.9)]">
+              {/* Capa 2: Emblema y Logotipo Duality Rol (Reducido un 5% para liberar el anillo superior del agujero negro) */}
+              <div className="relative w-[95%] aspect-[1024/512] drop-shadow-[0_4px_30px_rgba(0,0,0,0.9)]">
                 <Image
                   src="/brand/hero_logo.webp"
                   alt="Duality Rol — Emblema Sol y Luna"
                   fill
                   priority
-                  sizes="(max-width: 640px) 80vw, (max-width: 1024px) 55vw, 42vw"
+                  sizes="(max-width: 640px) 76vw, (max-width: 1024px) 52vw, 40vw"
                   className="w-full h-full object-contain pointer-events-none"
                 />
               </div>
 
-              {/* Capa 3: Eslogan en dos líneas como texto HTML independiente (Tamaño ampliado y equilibrado) */}
+              {/* Capa 3: Eslogan en dos líneas como texto HTML independiente (Contraste #F0C879 en línea 2) */}
               <h1 className="w-full flex flex-col items-center text-center font-serif leading-tight mt-1 sm:mt-1.5 md:mt-2 lg:mt-2.5">
                 <span className="text-[10px] min-[380px]:text-[12px] min-[480px]:text-[13.5px] sm:text-base md:text-lg lg:text-xl xl:text-2xl tracking-[0.24em] min-[380px]:tracking-[0.26em] sm:tracking-[0.28em] md:tracking-[0.3em] text-celestial-ivory font-semibold uppercase drop-shadow-[0_2px_12px_rgba(0,0,0,1)]">
                   Forjados bajo la luz celestial
                 </span>
-                <span className="text-[9px] min-[380px]:text-[10.5px] min-[480px]:text-[12px] sm:text-sm md:text-base lg:text-lg xl:text-xl tracking-[0.26em] min-[380px]:tracking-[0.3em] sm:tracking-[0.32em] md:tracking-[0.35em] text-gold-400 font-semibold uppercase drop-shadow-[0_2px_12px_rgba(0,0,0,1)] mt-0.5 sm:mt-1">
+                <span className="text-[9px] min-[380px]:text-[10.5px] min-[480px]:text-[12px] sm:text-sm md:text-base lg:text-lg xl:text-xl tracking-[0.26em] min-[380px]:tracking-[0.3em] sm:tracking-[0.32em] md:tracking-[0.35em] text-[#F0C879] font-semibold uppercase [text-shadow:0_2px_4px_rgba(0,0,0,0.95),0_0_12px_rgba(0,0,0,0.85)] mt-0.5 sm:mt-1">
                   Templados en la penumbra
                 </span>
               </h1>
 
-              {/* Ornamento diamante estilizado inferior ampliado proporcionalmente */}
+              {/* Ornamento diamante estilizado inferior */}
               <div className="mt-1.5 sm:mt-2 md:mt-2.5 lg:mt-3 opacity-90 flex items-center justify-center w-full">
                 <svg
-                  className="w-24 min-[380px]:w-32 min-[480px]:w-40 sm:w-52 md:w-64 lg:w-72 xl:w-80 h-2 sm:h-2.5 md:h-3 text-gold-400"
+                  className="w-24 min-[380px]:w-32 min-[480px]:w-40 sm:w-52 md:w-64 lg:w-72 xl:w-80 h-2 sm:h-2.5 md:h-3 text-[#F0C879]"
                   viewBox="0 0 160 10"
                   fill="none"
                 >
-                  <line x1="0" y1="5" x2="68" y2="5" stroke="currentColor" strokeWidth="0.8" strokeOpacity="0.6" />
+                  <line x1="0" y1="5" x2="68" y2="5" stroke="currentColor" strokeWidth="0.8" strokeOpacity="0.65" />
                   <polygon points="80,1 84.5,5 80,9 75.5,5" fill="currentColor" />
-                  <line x1="92" y1="5" x2="160" y2="5" stroke="currentColor" strokeWidth="0.8" strokeOpacity="0.6" />
+                  <line x1="92" y1="5" x2="160" y2="5" stroke="currentColor" strokeWidth="0.8" strokeOpacity="0.65" />
                 </svg>
               </div>
             </div>
