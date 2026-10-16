@@ -181,7 +181,7 @@ export default function StoreFrontDemoPage() {
           <div className="absolute -right-28 top-1/3 w-[35rem] h-[35rem] bg-slate-400/10 rounded-full blur-[140px] pointer-events-none" />
         </div>
 
-        {/* 1. COMPOSICIÓN MULTI-CAPA DEL BANNER HERO (FONDO COMFYUI + LOGO TRANSPARENTE + ESLOGAN HTML) */}
+        {/* 1. COMPOSICIÓN MULTI-CAPA DEL BANNER HERO (FONDO COMFYUI + LOGO SUPERPUESTO + ESLOGAN HTML) */}
         <div className="relative w-full aspect-[1024/400] overflow-hidden bg-black select-none">
           {/* Capa 1: Fondo generado con ComfyUI (100% fiel, sin alterar) */}
           <Image
@@ -193,40 +193,43 @@ export default function StoreFrontDemoPage() {
             className="w-full h-full object-cover pointer-events-none"
           />
 
-          {/* Capa 2: Emblema y Logotipo Duality Rol (Superpuesto con alineación exacta al montaje) */}
-          <div className="absolute left-[47.15%] top-[19.1%] w-[39.2%] aspect-[1024/512] -translate-x-1/2 pointer-events-none drop-shadow-[0_4px_25px_rgba(0,0,0,0.85)]">
-            <Image
-              src="/brand/hero_logo.webp"
-              alt="Duality Rol — Emblema Sol y Luna"
-              fill
-              priority
-              sizes="(max-width: 768px) 45vw, 402px"
-              className="w-full h-full object-contain pointer-events-none"
-            />
-          </div>
+          {/* CONTENEDOR COMÚN CENTRADO PARA TODO EL CONJUNTO VISUAL (Logo + Eslogan + Adorno) */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10 px-4">
+            <div className="flex flex-col items-center justify-center w-[88%] sm:w-[70%] md:w-[54%] lg:w-[46%] xl:w-[41%] translate-y-[1.5%] sm:translate-y-[2%]">
+              {/* Capa 2: Emblema y Logotipo Duality Rol (Perfectamente equilibrado sobre el agujero negro) */}
+              <div className="relative w-full aspect-[1024/512] drop-shadow-[0_4px_30px_rgba(0,0,0,0.9)]">
+                <Image
+                  src="/brand/hero_logo.webp"
+                  alt="Duality Rol — Emblema Sol y Luna"
+                  fill
+                  priority
+                  sizes="(max-width: 640px) 80vw, (max-width: 1024px) 55vw, 42vw"
+                  className="w-full h-full object-contain pointer-events-none"
+                />
+              </div>
 
-          {/* Capa 3: Eslogan en dos líneas como texto HTML independiente */}
-          <div className="absolute left-[47.15%] top-[71.5%] -translate-x-1/2 w-[92%] sm:w-[75%] md:w-[60%] lg:w-[50%] text-center pointer-events-none flex flex-col items-center">
-            <h1 className="flex flex-col items-center gap-0.5 sm:gap-1 md:gap-1.5 font-serif leading-none">
-              <span className="text-[8px] min-[360px]:text-[10px] min-[480px]:text-xs sm:text-sm md:text-base lg:text-[17px] tracking-[0.22em] min-[360px]:tracking-[0.26em] sm:tracking-[0.28em] text-celestial-ivory font-medium uppercase drop-shadow-[0_2px_10px_rgba(0,0,0,0.95)]">
-                Forjados bajo la luz celestial
-              </span>
-              <span className="text-[7px] min-[360px]:text-[9px] min-[480px]:text-[11px] sm:text-xs md:text-[13px] lg:text-[15px] tracking-[0.26em] min-[360px]:tracking-[0.3em] sm:tracking-[0.32em] text-gold-400 font-medium uppercase drop-shadow-[0_2px_10px_rgba(0,0,0,0.95)] mt-0.5 sm:mt-1">
-                Templados en la penumbra
-              </span>
-            </h1>
+              {/* Capa 3: Eslogan en dos líneas como texto HTML independiente (Tamaño ampliado y equilibrado) */}
+              <h1 className="w-full flex flex-col items-center text-center font-serif leading-tight mt-1 sm:mt-1.5 md:mt-2 lg:mt-2.5">
+                <span className="text-[10px] min-[380px]:text-[12px] min-[480px]:text-[13.5px] sm:text-base md:text-lg lg:text-xl xl:text-2xl tracking-[0.24em] min-[380px]:tracking-[0.26em] sm:tracking-[0.28em] md:tracking-[0.3em] text-celestial-ivory font-semibold uppercase drop-shadow-[0_2px_12px_rgba(0,0,0,1)]">
+                  Forjados bajo la luz celestial
+                </span>
+                <span className="text-[9px] min-[380px]:text-[10.5px] min-[480px]:text-[12px] sm:text-sm md:text-base lg:text-lg xl:text-xl tracking-[0.26em] min-[380px]:tracking-[0.3em] sm:tracking-[0.32em] md:tracking-[0.35em] text-gold-400 font-semibold uppercase drop-shadow-[0_2px_12px_rgba(0,0,0,1)] mt-0.5 sm:mt-1">
+                  Templados en la penumbra
+                </span>
+              </h1>
 
-            {/* Ornamento diamante celestial estilizado */}
-            <div className="mt-1 sm:mt-1.5 md:mt-2 opacity-80 flex items-center justify-center">
-              <svg
-                className="w-14 min-[360px]:w-18 min-[480px]:w-24 sm:w-32 md:w-40 h-1.5 sm:h-2 text-gold-400"
-                viewBox="0 0 100 8"
-                fill="none"
-              >
-                <line x1="0" y1="4" x2="42" y2="4" stroke="currentColor" strokeWidth="0.6" strokeOpacity="0.5" />
-                <polygon points="50,1 53,4 50,7 47,4" fill="currentColor" />
-                <line x1="58" y1="4" x2="100" y2="4" stroke="currentColor" strokeWidth="0.6" strokeOpacity="0.5" />
-              </svg>
+              {/* Ornamento diamante estilizado inferior ampliado proporcionalmente */}
+              <div className="mt-1.5 sm:mt-2 md:mt-2.5 lg:mt-3 opacity-90 flex items-center justify-center w-full">
+                <svg
+                  className="w-24 min-[380px]:w-32 min-[480px]:w-40 sm:w-52 md:w-64 lg:w-72 xl:w-80 h-2 sm:h-2.5 md:h-3 text-gold-400"
+                  viewBox="0 0 160 10"
+                  fill="none"
+                >
+                  <line x1="0" y1="5" x2="68" y2="5" stroke="currentColor" strokeWidth="0.8" strokeOpacity="0.6" />
+                  <polygon points="80,1 84.5,5 80,9 75.5,5" fill="currentColor" />
+                  <line x1="92" y1="5" x2="160" y2="5" stroke="currentColor" strokeWidth="0.8" strokeOpacity="0.6" />
+                </svg>
+              </div>
             </div>
           </div>
 
