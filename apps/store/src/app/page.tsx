@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import {
   ShoppingBag,
@@ -8,17 +8,19 @@ import {
   MapPin,
   ShieldCheck,
   ChevronRight,
+  ChevronLeft,
   X,
   Info,
   Check,
   Package,
-  Layers,
+  Eye,
 } from "lucide-react";
 import {
   DEMO_CATEGORIES,
   DEMO_PRODUCTS,
   DemoProduct,
   DemoVariant,
+  DemoProductImage,
 } from "../lib/demo-products";
 
 interface CartItem {
@@ -37,6 +39,13 @@ export default function StoreFrontDemoPage() {
     "demo-prod-5": "var-5a",
     "demo-prod-6": "var-6a",
   });
+  // Seguimiento de imagen de galería activa por producto (para productos con múltiples vistas como el Dragón)
+  const [selectedGalleryImages, setSelectedGalleryImages] = useState<Record<string, string>>({});
+  // Producto abierto en la vista de detalle / galería modal
+  const [detailProductId, setDetailProductId] = useState<string | null>(null);
+  // Registro de imágenes que hayan fallado al cargar para mostrar un fallback elegante
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
+
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [activeToast, setActiveToast] = useState<string | null>(null);
@@ -47,10 +56,131 @@ export default function StoreFrontDemoPage() {
       ? DEMO_PRODUCTS
       : DEMO_PRODUCTS.filter((p) => p.categorySlug === selectedCategory);
 
-  // Manejo de selección de variantes
-  const handleVariantChange = (productId: string, variantId: string) => {
+  const detailProduct = detailProductId
+    ? DEMO_PRODUCTS.find((p) => p.id === detailProductId) || null
+    : null;
+
+  // Resolver la imagen activa de un producto según la variante seleccionada o vista de galería elegida
+  const resolveActiveProductImage = useCallback(
+    (product: DemoProduct, activeVariant: DemoVariant): DemoProductImage => {
+      const explicitGalleryId = selectedGalleryImages[product.id];
+      if (explicitGalleryId) {
+        const found = product.gallery.find((img) => img.id === explicitGalleryId);
+        if (found) {
+          // Si la imagen explícita pertenece a otra variante diferente de la actual, priorizar la variante activa
+          if (!found.variantId || found.variantId === activeVariant.id) {
+            return found;
+          }
+        }
+      }
+
+      // Buscar en la galería la imagen asociada a la variante seleccionada o a su URL
+      const variantGalleryImg =
+        product.gallery.find((img) => img.variantId === activeVariant.id) ||
+        (activeVariant.image
+          ? product.gallery.find((img) => img.url === activeVariant.image)
+          : undefined);
+      if (variantGalleryImg) {
+        return variantGalleryImg;
+      }
+
+      // Si la variante tiene imagen directa no listada en gallery, usarla
+      if (activeVariant.image) {
+        return {
+          id: `${activeVariant.id}-img`,
+          url: activeVariant.image,
+          alt: activeVariant.imageAlt || `${product.name} — ${activeVariant.name}`,
+          label: activeVariant.name,
+          variantId: activeVariant.id,
+        };
+      }
+
+      // Fallback a la primera imagen de galería o mainImage del producto
+      return (
+        product.gallery[0] || {
+          id: `${product.id}-main`,
+          url: product.mainImage,
+          alt: product.mainImageAlt,
+          label: product.name,
+        }
+      );
+    },
+    [selectedGalleryImages]
+  );
+
+  // Manejo de selección de variantes (sincroniza automáticamente la imagen asociada)
+  const handleVariantChange = useCallback((productId: string, variantId: string) => {
     setSelectedVariants((prev) => ({ ...prev, [productId]: variantId }));
+    const product = DEMO_PRODUCTS.find((p) => p.id === productId);
+    const matchingGalleryImg = product?.gallery.find((img) => img.variantId === variantId);
+    if (matchingGalleryImg) {
+      setSelectedGalleryImages((prev) => ({ ...prev, [productId]: matchingGalleryImg.id }));
+    }
+  }, []);
+
+  // Manejo de selección de miniatura en la galería (sincroniza variante si la imagen corresponde a un acabado)
+  const handleGalleryImageSelect = useCallback(
+    (product: DemoProduct, image: DemoProductImage) => {
+      setSelectedGalleryImages((prev) => ({ ...prev, [product.id]: image.id }));
+      if (image.variantId) {
+        setSelectedVariants((prev) => ({ ...prev, [product.id]: image.variantId! }));
+      }
+    },
+    []
+  );
+
+  // Abrir vista de detalle sincronizada con el estado actual de la tarjeta
+  const handleOpenDetail = (product: DemoProduct) => {
+    const activeVariantId = selectedVariants[product.id] || product.variants[0].id;
+    const activeVariant =
+      product.variants.find((v) => v.id === activeVariantId) || product.variants[0];
+    const currentImg = resolveActiveProductImage(product, activeVariant);
+    setSelectedGalleryImages((prev) => ({ ...prev, [product.id]: currentImg.id }));
+    setDetailProductId(product.id);
   };
+
+  // Navegación por teclado (Escape, Flecha Izquierda, Flecha Derecha) dentro de la galería de detalle
+  useEffect(() => {
+    if (!detailProduct) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setDetailProductId(null);
+        return;
+      }
+      if (detailProduct.gallery.length <= 1) return;
+
+      const activeVariantId =
+        selectedVariants[detailProduct.id] || detailProduct.variants[0].id;
+      const activeVariant =
+        detailProduct.variants.find((v) => v.id === activeVariantId) ||
+        detailProduct.variants[0];
+      const currentImg = resolveActiveProductImage(detailProduct, activeVariant);
+      const currentIndex = detailProduct.gallery.findIndex(
+        (img) => img.id === currentImg.id
+      );
+
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        const nextIndex = (currentIndex + 1) % detailProduct.gallery.length;
+        handleGalleryImageSelect(detailProduct, detailProduct.gallery[nextIndex]);
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        const prevIndex =
+          (currentIndex - 1 + detailProduct.gallery.length) %
+          detailProduct.gallery.length;
+        handleGalleryImageSelect(detailProduct, detailProduct.gallery[prevIndex]);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [
+    detailProduct,
+    selectedVariants,
+    resolveActiveProductImage,
+    handleGalleryImageSelect,
+  ]);
 
   // Agregar al carrito demostrativo
   const handleAddToCart = (product: DemoProduct) => {
@@ -89,7 +219,7 @@ export default function StoreFrontDemoPage() {
   );
 
   return (
-    <div className="relative min-h-screen bg-obsidian-900 text-celestial-ivory flex flex-col cosmic-radial-bg selection:bg-gold-500 selection:text-obsidian-950">
+    <div className="relative min-h-screen bg-obsidian-900 text-celestial-ivory flex flex-col selection:bg-gold-500 selection:text-obsidian-950">
       {/* ---------------------------------------------------------------------- */}
       {/* BANNER SUPERIOR DE AVISO: MODO DEMOSTRACIÓN */}
       {/* ---------------------------------------------------------------------- */}
@@ -108,152 +238,140 @@ export default function StoreFrontDemoPage() {
       </div>
 
       {/* ---------------------------------------------------------------------- */}
-      {/* BARRA DE NAVEGACIÓN PRINCIPAL */}
+      {/* BARRA DE NAVEGACIÓN PRINCIPAL EN FILA ÚNICA HORIZONTAL (ESCRITORIO) */}
       {/* ---------------------------------------------------------------------- */}
-      <header className="sticky top-0 z-40 bg-obsidian-900/90 backdrop-blur-md border-b border-obsidian-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
-          {/* EMBLEMA DORADO ENCABEZADO */}
-          <div className="flex items-center gap-3">
-            <div className="relative h-11 w-11 sm:h-[52px] sm:w-[52px] cursor-pointer flex-shrink-0">
-              <Image
-                src="/brand/dualidad_emblema.webp"
-                alt="Duality Rol"
-                fill
-                priority
-                sizes="(max-width: 640px) 44px, 52px"
-                className="object-contain"
-              />
+      <header className="sticky top-0 z-40 bg-obsidian-900/95 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-3 sm:px-5 xl:px-8">
+          <div className="flex flex-wrap lg:flex-nowrap items-center justify-between gap-y-2.5 lg:gap-x-2 xl:gap-x-4 py-2.5 lg:py-0 lg:h-16">
+            {/* 1. EMBLEMA DORADO A LA IZQUIERDA */}
+            <div className="flex items-center flex-shrink-0 order-1">
+              <div className="relative h-11 w-11 sm:h-12 sm:w-12 cursor-pointer flex-shrink-0">
+                <Image
+                  src="/brand/dualidad_emblema.webp"
+                  alt="Duality Rol"
+                  fill
+                  priority
+                  sizes="(max-width: 640px) 44px, 48px"
+                  className="object-contain"
+                />
+              </div>
             </div>
-          </div>
 
-          {/* BOTÓN DEL CARRITO DEMO */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setIsCartOpen(true)}
-              className="relative flex items-center gap-2.5 px-4 py-2 rounded-lg bg-obsidian-800 hover:bg-obsidian-700 border border-obsidian-600 hover:border-gold-500/40 text-celestial-ivory transition-all group"
-              aria-label="Abrir carrito"
+            {/* 2. CATEGORÍAS DISTRIBUIDAS HORIZONTALMENTE EN EL ESPACIO CENTRAL */}
+            <nav
+              aria-label="Categorías del catálogo"
+              className="order-3 lg:order-2 w-full lg:w-auto lg:flex-1 min-w-0 overflow-x-auto lg:overflow-visible scrollbar-none pb-1 lg:pb-0"
             >
-              <ShoppingBag className="w-4 h-4 text-gold-400 group-hover:scale-110 transition-transform" />
-              <span className="hidden sm:inline text-xs uppercase tracking-widest font-serif text-celestial-silver">
-                Carrito
-              </span>
-              {totalCartCount > 0 ? (
-                <span className="bg-gold-500 text-obsidian-950 text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
-                  {totalCartCount}
-                </span>
-              ) : (
-                <span className="text-xs text-celestial-muted">0</span>
-              )}
-            </button>
-          </div>
-        </div>
+              <div className="flex items-center lg:justify-center gap-1.5 lg:gap-1 xl:gap-2">
+                {DEMO_CATEGORIES.map((cat) => {
+                  const isSelected = selectedCategory === cat.slug;
+                  return (
+                    <button
+                      key={cat.id}
+                      onClick={() => setSelectedCategory(cat.slug)}
+                      className={`whitespace-nowrap px-3 lg:px-2 xl:px-3 py-1.5 rounded-full border text-[11px] xl:text-xs tracking-wide xl:tracking-wider uppercase font-medium transition-all flex-shrink-0 ${
+                        isSelected
+                          ? "bg-gold-500/15 border-gold-500 text-gold-300 shadow-gold-glow"
+                          : "bg-obsidian-800/60 border-obsidian-600/80 text-celestial-silver hover:border-celestial-silver/40 hover:text-celestial-ivory"
+                      }`}
+                    >
+                      {cat.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </nav>
 
-        {/* NAVEGACIÓN HORIZONTAL DE CATEGORÍAS */}
-        <div className="border-t border-obsidian-700/60 bg-obsidian-950/60 overflow-x-auto scrollbar-none">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-2 py-2.5 text-xs">
-            {DEMO_CATEGORIES.map((cat) => {
-              const isSelected = selectedCategory === cat.slug;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => setSelectedCategory(cat.slug)}
-                  className={`whitespace-nowrap px-3.5 py-1.5 rounded-full border text-xs tracking-wider uppercase font-medium transition-all ${
-                    isSelected
-                      ? "bg-gold-500/15 border-gold-500 text-gold-300 shadow-gold-glow"
-                      : "bg-obsidian-800/60 border-obsidian-600/80 text-celestial-silver hover:border-celestial-silver/40 hover:text-celestial-ivory"
-                  }`}
-                >
-                  {cat.name}
-                </button>
-              );
-            })}
+            {/* 3. BOTÓN DEL CARRITO DEMO ALINEADO A LA DERECHA */}
+            <div className="flex items-center flex-shrink-0 order-2 lg:order-3">
+              <button
+                onClick={() => setIsCartOpen(true)}
+                className="relative flex items-center gap-2 sm:gap-2.5 px-3 sm:px-3.5 xl:px-4 py-1.5 sm:py-2 rounded-lg bg-obsidian-800/90 hover:bg-obsidian-700 border border-obsidian-600 hover:border-gold-500/40 text-celestial-ivory transition-all group"
+                aria-label="Abrir carrito"
+              >
+                <ShoppingBag className="w-4 h-4 text-gold-400 group-hover:scale-110 transition-transform" />
+                <span className="hidden sm:inline text-xs uppercase tracking-widest font-serif text-celestial-silver">
+                  Carrito
+                </span>
+                {totalCartCount > 0 ? (
+                  <span className="bg-gold-500 text-obsidian-950 text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
+                    {totalCartCount}
+                  </span>
+                ) : (
+                  <span className="text-xs text-celestial-muted">0</span>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
       {/* ---------------------------------------------------------------------- */}
-      {/* HERO SECTION DE IDENTIDAD CÓSMICA (BANNER CINEMATOGRÁFICO FULL-WIDTH) */}
+      {/* HERO SECTION Y DESCRIPCIÓN EN COMPOSICIÓN CONTINUA */}
       {/* ---------------------------------------------------------------------- */}
-      <section className="relative w-full overflow-hidden border-b border-obsidian-700/60 bg-obsidian-950">
-        {/* Nebulosas ambientales para pantallas ultra-anchas */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute -left-28 top-1/3 w-[35rem] h-[35rem] bg-gold-500/10 rounded-full blur-[140px] pointer-events-none" />
-          <div className="absolute -right-28 top-1/3 w-[35rem] h-[35rem] bg-slate-400/10 rounded-full blur-[140px] pointer-events-none" />
-        </div>
-
-        {/* 1. COMPOSICIÓN MULTI-CAPA DEL BANNER HERO (FONDO COMFYUI + LOGO SUPERPUESTO + ESLOGAN HTML) */}
-        <div className="relative w-full aspect-[1024/400] overflow-hidden bg-black select-none">
-          {/* Capa 1: Fondo generado con ComfyUI (100% fiel, sin alterar) */}
+      <section className="relative w-full">
+        {/* 1. BANNER COMPLETO DIRECTO MEJORADO CON COMFYUI (duality_banner_upscaled_3840.png 3840x1526) */}
+        <div className="relative w-full aspect-[3840/1526] overflow-hidden bg-obsidian-900 select-none">
           <Image
-            src="/brand/hero_bg.webp"
-            alt="Fondo Cósmico Celestial Duality Rol"
-            fill
+            src="/brand/duality_banner_upscaled_3840.png"
+            alt="Duality Rol — Forjados bajo la luz celestial, templados en la penumbra"
+            width={3840}
+            height={1526}
             priority
+            quality={100}
+            unoptimized
             sizes="100vw"
-            className="w-full h-full object-cover pointer-events-none"
+            className="w-full h-auto block pointer-events-none"
           />
 
-          {/* CONTENEDOR COMÚN CENTRADO PARA TODO EL CONJUNTO VISUAL (Logo + Eslogan + Adorno) */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10 px-4">
-            <div className="flex flex-col items-center justify-center w-[88%] sm:w-[70%] md:w-[54%] lg:w-[46%] xl:w-[41%] translate-y-[1.5%] sm:translate-y-[2%]">
-              {/* Capa 2: Emblema y Logotipo Duality Rol (Reducido un 5% para liberar el anillo superior del agujero negro) */}
-              <div className="relative w-[95%] aspect-[1024/512] drop-shadow-[0_4px_30px_rgba(0,0,0,0.9)]">
-                <Image
-                  src="/brand/hero_logo.webp"
-                  alt="Duality Rol — Emblema Sol y Luna"
-                  fill
-                  priority
-                  sizes="(max-width: 640px) 76vw, (max-width: 1024px) 52vw, 40vw"
-                  className="w-full h-full object-contain pointer-events-none"
-                />
-              </div>
+          {/* Degradado superior sutil desde el color exacto del encabezado (obsidian-900) hacia transparente */}
+          <div className="absolute inset-x-0 top-0 h-8 sm:h-12 md:h-16 lg:h-20 bg-gradient-to-b from-obsidian-900 via-obsidian-900/60 to-transparent pointer-events-none" />
 
-              {/* Capa 3: Eslogan en dos líneas como texto HTML independiente (Contraste #F0C879 en línea 2) */}
-              <h1 className="w-full flex flex-col items-center text-center font-serif leading-tight mt-1 sm:mt-1.5 md:mt-2 lg:mt-2.5">
-                <span className="text-[10px] min-[380px]:text-[12px] min-[480px]:text-[13.5px] sm:text-base md:text-lg lg:text-xl xl:text-2xl tracking-[0.24em] min-[380px]:tracking-[0.26em] sm:tracking-[0.28em] md:tracking-[0.3em] text-celestial-ivory font-semibold uppercase drop-shadow-[0_2px_12px_rgba(0,0,0,1)]">
-                  Forjados bajo la luz celestial
-                </span>
-                <span className="text-[9px] min-[380px]:text-[10.5px] min-[480px]:text-[12px] sm:text-sm md:text-base lg:text-lg xl:text-xl tracking-[0.26em] min-[380px]:tracking-[0.3em] sm:tracking-[0.32em] md:tracking-[0.35em] text-[#F0C879] font-semibold uppercase [text-shadow:0_2px_4px_rgba(0,0,0,0.95),0_0_12px_rgba(0,0,0,0.85)] mt-0.5 sm:mt-1">
-                  Templados en la penumbra
-                </span>
-              </h1>
+          {/* Degradado inferior progresivo que funde el borde del banner con bg-obsidian-900 sin tapar el eslogan */}
+          <div className="absolute inset-x-0 bottom-0 h-14 sm:h-24 md:h-32 lg:h-36 bg-gradient-to-t from-obsidian-900 via-obsidian-900/70 to-transparent pointer-events-none" />
 
-              {/* Ornamento diamante estilizado inferior */}
-              <div className="mt-1.5 sm:mt-2 md:mt-2.5 lg:mt-3 opacity-90 flex items-center justify-center w-full">
-                <svg
-                  className="w-24 min-[380px]:w-32 min-[480px]:w-40 sm:w-52 md:w-64 lg:w-72 xl:w-80 h-2 sm:h-2.5 md:h-3 text-[#F0C879]"
-                  viewBox="0 0 160 10"
-                  fill="none"
-                >
-                  <line x1="0" y1="5" x2="68" y2="5" stroke="currentColor" strokeWidth="0.8" strokeOpacity="0.65" />
-                  <polygon points="80,1 84.5,5 80,9 75.5,5" fill="currentColor" />
-                  <line x1="92" y1="5" x2="160" y2="5" stroke="currentColor" strokeWidth="0.8" strokeOpacity="0.65" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          {/* Difuminado perimetral inferior para fundir con el fondo obsidiana de la página */}
-          <div className="absolute inset-x-0 bottom-0 h-6 sm:h-12 md:h-18 bg-gradient-to-t from-obsidian-900 via-obsidian-900/35 to-transparent pointer-events-none" />
+          {/* Encabezado semántico para accesibilidad/SEO sin duplicar texto en pantalla */}
+          <h1 className="sr-only">
+            Duality Rol — Forjados bajo la luz celestial, templados en la penumbra
+          </h1>
         </div>
 
-        {/* 2. TEXTO DESCRIPTIVO E INSIGNIAS INFORMATIVAS (CONTENIDO CENTRADO INFERIOR) */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center pt-5 sm:pt-7 pb-10 sm:pb-12">
+        {/*
+          IMPLEMENTACIÓN MULTI-CAPA ANTERIOR CONSERVADA PARA REVERSIÓN RÁPIDA:
+          <div className="relative w-full aspect-[1024/400] overflow-hidden bg-obsidian-900 select-none">
+            <Image src="/brand/hero_bg.webp" alt="Fondo Cósmico Celestial Duality Rol" fill priority sizes="100vw" className="w-full h-full object-cover pointer-events-none" />
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10 px-4">
+              <div className="flex flex-col items-center justify-center w-[88%] sm:w-[70%] md:w-[54%] lg:w-[46%] xl:w-[41%] translate-y-[1.5%] sm:translate-y-[2%]">
+                <div className="relative w-[95%] aspect-[1024/512] drop-shadow-[0_4px_30px_rgba(0,0,0,0.9)]">
+                  <Image src="/brand/hero_logo.webp" alt="Duality Rol — Emblema Sol y Luna" fill priority sizes="(max-width: 640px) 76vw, (max-width: 1024px) 52vw, 40vw" className="w-full h-full object-contain pointer-events-none" />
+                </div>
+                <h1 className="w-full flex flex-col items-center text-center font-serif leading-tight mt-1 sm:mt-1.5 md:mt-2 lg:mt-2.5">
+                  <span className="text-[10px] min-[380px]:text-[12px] min-[480px]:text-[13.5px] sm:text-base md:text-lg lg:text-xl xl:text-2xl tracking-[0.24em] min-[380px]:tracking-[0.26em] sm:tracking-[0.28em] md:tracking-[0.3em] text-celestial-ivory font-semibold uppercase drop-shadow-[0_2px_12px_rgba(0,0,0,1)]">Forjados bajo la luz celestial</span>
+                  <span className="text-[9px] min-[380px]:text-[10.5px] min-[480px]:text-[12px] sm:text-sm md:text-base lg:text-lg xl:text-xl tracking-[0.26em] min-[380px]:tracking-[0.3em] sm:tracking-[0.32em] md:tracking-[0.35em] text-[#F0C879] font-semibold uppercase [text-shadow:0_2px_4px_rgba(0,0,0,0.95),0_0_12px_rgba(0,0,0,0.85)] mt-0.5 sm:mt-1">Templados en la penumbra</span>
+                </h1>
+              </div>
+            </div>
+            <div className="absolute inset-x-0 bottom-0 h-6 sm:h-12 md:h-18 bg-gradient-to-t from-obsidian-900 via-obsidian-900/35 to-transparent pointer-events-none" />
+          </div>
+        */}
+
+        {/* 2. TEXTO DESCRIPTIVO E INSIGNIAS INFORMATIVAS (INTEGRADOS EN CONTINUIDAD CON EL HERO) */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center -mt-1 sm:-mt-3 pt-2 pb-6 sm:pb-8">
           <p className="text-xs sm:text-sm md:text-base text-celestial-silver max-w-2xl mx-auto font-light leading-relaxed">
             Accesorios de rol boutique, dados artesanales y piezas singulares impresas en 3D.
             Cada lanzamiento equilibra el día, la noche y el destino en tu mesa.
           </p>
 
-          <div className="mt-6 sm:mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs text-celestial-silver">
-            <div className="flex items-center gap-2 bg-obsidian-800/80 border border-obsidian-600 px-3.5 py-1.5 rounded-md backdrop-blur-sm">
+          <div className="mt-4 sm:mt-5 flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 text-xs text-celestial-silver">
+            <div className="flex items-center gap-2 bg-obsidian-800/70 border border-obsidian-700/80 px-3.5 py-1.5 rounded-md">
               <MapPin className="w-3.5 h-3.5 text-gold-400" />
               <span>Retiro acordado (Argentina)</span>
             </div>
-            <div className="flex items-center gap-2 bg-obsidian-800/80 border border-obsidian-600 px-3.5 py-1.5 rounded-md backdrop-blur-sm">
+            <div className="flex items-center gap-2 bg-obsidian-800/70 border border-obsidian-700/80 px-3.5 py-1.5 rounded-md">
               <ShieldCheck className="w-3.5 h-3.5 text-gold-400" />
               <span>Calidad artesanal 3D & Reventa seleccionada</span>
             </div>
-            <div className="flex items-center gap-2 bg-obsidian-800/80 border border-obsidian-600 px-3.5 py-1.5 rounded-md backdrop-blur-sm">
+            <div className="flex items-center gap-2 bg-obsidian-800/70 border border-obsidian-700/80 px-3.5 py-1.5 rounded-md">
               <Sparkles className="w-3.5 h-3.5 text-gold-400" />
               <span>Precios en Pesos Argentinos (ARS)</span>
             </div>
@@ -264,7 +382,7 @@ export default function StoreFrontDemoPage() {
       {/* ---------------------------------------------------------------------- */}
       {/* CATÁLOGO DE PRODUCTOS DE DEMOSTRACIÓN */}
       {/* ---------------------------------------------------------------------- */}
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-12 w-full">
         <div className="flex items-baseline justify-between mb-8 border-b border-obsidian-700/60 pb-4">
           <div>
             <h2 className="text-xl sm:text-2xl font-serif tracking-wider uppercase text-celestial-ivory">
@@ -285,31 +403,81 @@ export default function StoreFrontDemoPage() {
             const activeVariantId = selectedVariants[product.id] || product.variants[0].id;
             const activeVariant =
               product.variants.find((v) => v.id === activeVariantId) || product.variants[0];
+            const activeImage = resolveActiveProductImage(product, activeVariant);
+            const hasImageError = Boolean(failedImages[activeImage.url]);
+            const isMultiViewSingleVariant =
+              product.variants.length === 1 && product.gallery.length > 1;
 
             return (
               <div
                 key={product.id}
                 className="group relative bg-obsidian-800 rounded-xl border border-obsidian-600 hover:border-gold-500/50 transition-all duration-300 flex flex-col overflow-hidden hover:shadow-gold-glow"
               >
-                {/* CABECERA DE IMAGEN / PREVIEW ARTÍSTICO */}
-                <div className="relative aspect-[4/3] bg-gradient-to-b from-obsidian-950 to-obsidian-850 p-6 flex flex-col justify-between items-center border-b border-obsidian-700/60 overflow-hidden">
-                  {/* Insignia Creación Duality */}
-                  <div className="w-full flex items-center justify-between relative z-10">
+                {/* CABECERA DE FOTOGRAFÍA CONCEPTUAL DEL PRODUCTO */}
+                <div className="relative aspect-square bg-obsidian-950 border-b border-obsidian-700/60 overflow-hidden select-none">
+                  {/* Fotografía principal de la variante / vista activa con fallback elegante */}
+                  {!hasImageError ? (
+                    <button
+                      type="button"
+                      onClick={() => handleOpenDetail(product)}
+                      className="relative w-full h-full block text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-inset cursor-pointer"
+                      aria-label={`Ver galería y detalles de ${product.name} (${activeImage.label})`}
+                    >
+                      <Image
+                        key={activeImage.url}
+                        src={activeImage.url}
+                        alt={activeImage.alt}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        onError={() =>
+                          setFailedImages((prev) => ({ ...prev, [activeImage.url]: true }))
+                        }
+                        className="object-contain p-1.5 transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                      />
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handleOpenDetail(product)}
+                      className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-gradient-to-b from-obsidian-950 to-obsidian-850"
+                      aria-label={`Ver detalles de ${product.name}`}
+                    >
+                      <div className="w-20 h-20 rounded-full border border-gold-500/20 bg-obsidian-900/80 flex items-center justify-center p-3 shadow-inner">
+                        <Image
+                          src="/brand/logo_only.png"
+                          alt="Símbolo Duality Rol"
+                          width={48}
+                          height={48}
+                          className="object-contain opacity-75"
+                        />
+                      </div>
+                      <span className="mt-3 text-xs font-serif text-celestial-silver">
+                        {activeImage.label}
+                      </span>
+                    </button>
+                  )}
+
+                  {/* Viñetas oscuras superior e inferior sutiles para garantizar legibilidad de insignias */}
+                  <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-obsidian-950/85 via-obsidian-950/35 to-transparent pointer-events-none" />
+                  <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-obsidian-950/90 via-obsidian-950/45 to-transparent pointer-events-none" />
+
+                  {/* Barra superior: Insignia Creación Duality / Reventa y Stock */}
+                  <div className="absolute inset-x-0 top-0 p-3.5 flex items-center justify-between z-10 pointer-events-none">
                     {product.isDualityCreation ? (
-                      <span className="inline-flex items-center gap-1.5 text-[10px] font-serif uppercase tracking-widest px-2.5 py-1 rounded-full bg-gold-500/20 text-gold-300 border border-gold-500/40 backdrop-blur-sm">
+                      <span className="inline-flex items-center gap-1.5 text-[10px] font-serif uppercase tracking-widest px-2.5 py-1 rounded-full bg-obsidian-950/85 text-gold-300 border border-gold-500/45 backdrop-blur-md shadow-sm">
                         <Sparkles className="w-3 h-3 text-gold-400" />
                         Creación Duality
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full bg-obsidian-700/80 text-celestial-silver border border-obsidian-600">
+                      <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full bg-obsidian-950/85 text-celestial-silver border border-obsidian-600 backdrop-blur-md shadow-sm">
                         <Package className="w-3 h-3" />
                         Reventa
                       </span>
                     )}
 
-                    <span className="text-[11px] font-mono text-celestial-silver">
+                    <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-obsidian-950/85 border border-obsidian-700/80 backdrop-blur-md">
                       {activeVariant.stock > 0 ? (
-                        <span className="text-emerald-400/90 flex items-center gap-1">
+                        <span className="text-emerald-400/95 flex items-center gap-1.5">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                           Stock: {activeVariant.stock}
                         </span>
@@ -319,41 +487,48 @@ export default function StoreFrontDemoPage() {
                     </span>
                   </div>
 
-                  {/* Iconografía central simbólica de la pieza */}
-                  <div className="relative my-auto flex flex-col items-center justify-center group-hover:scale-105 transition-transform duration-500">
-                    <div className="w-20 h-20 rounded-full border border-gold-500/20 bg-obsidian-900/80 flex items-center justify-center p-3 shadow-inner">
-                      <Image
-                        src="/brand/logo_only.png"
-                        alt="Símbolo Duality"
-                        width={48}
-                        height={48}
-                        className="object-contain opacity-75 group-hover:opacity-100 transition-opacity"
-                      />
+                  {/* Barra inferior sobre imagen: Categoría, SKU y acceso rápido a Galería */}
+                  <div className="absolute inset-x-0 bottom-0 p-3.5 flex items-end justify-between gap-2 z-10 pointer-events-none">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] uppercase tracking-widest text-gold-400 font-serif drop-shadow">
+                        {product.categoryName}
+                      </span>
+                      <span className="text-[10px] uppercase font-mono tracking-wider text-celestial-silver/90">
+                        SKU: {activeVariant.sku}
+                      </span>
                     </div>
-                    <span className="mt-2 text-[10px] uppercase font-mono tracking-widest text-celestial-muted">
-                      SKU: {activeVariant.sku}
-                    </span>
-                  </div>
 
-                  {/* Categoría inferior */}
-                  <div className="w-full text-left relative z-10">
-                    <span className="text-[11px] uppercase tracking-widest text-gold-400/90 font-serif">
-                      {product.categoryName}
-                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenDetail(product)}
+                      className="pointer-events-auto inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-obsidian-900/90 hover:bg-obsidian-800 text-celestial-ivory border border-obsidian-600 hover:border-gold-500/50 text-[11px] font-medium transition-all backdrop-blur-md shadow-sm"
+                      aria-label={`Abrir galería de ${product.name}`}
+                    >
+                      <Eye className="w-3.5 h-3.5 text-gold-400" />
+                      <span>Galería ({product.gallery.length})</span>
+                    </button>
                   </div>
                 </div>
 
                 {/* CONTENIDO DE FICHA */}
                 <div className="p-5 flex-1 flex flex-col justify-between">
                   <div>
-                    <h3 className="text-base font-serif tracking-wide text-celestial-ivory group-hover:text-gold-300 transition-colors">
-                      {product.name}
-                    </h3>
+                    <div className="flex items-start justify-between gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenDetail(product)}
+                        className="text-left focus:outline-none focus-visible:underline"
+                      >
+                        <h3 className="text-base font-serif tracking-wide text-celestial-ivory group-hover:text-gold-300 transition-colors">
+                          {product.name}
+                        </h3>
+                      </button>
+                    </div>
                     <p className="mt-2 text-xs text-celestial-silver line-clamp-2 font-light leading-relaxed">
                       {product.description}
                     </p>
 
-                    {/* SELECTOR DE VARIANTES */}
+                    {/* SELECTOR DE VARIANTES (Productos con múltiples acabados) */}
                     {product.variants.length > 1 && (
                       <div className="mt-4">
                         <label className="text-[11px] uppercase tracking-wider text-celestial-muted block mb-1.5 font-medium">
@@ -380,6 +555,42 @@ export default function StoreFrontDemoPage() {
                         </div>
                       </div>
                     )}
+
+                    {/* SELECTOR DE VISTAS DE GALERÍA (Para producto de variante única con 2 vistas como el Dragón) */}
+                    {isMultiViewSingleVariant && (
+                      <div className="mt-4">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-[11px] uppercase tracking-wider text-celestial-muted font-medium">
+                            Acabado: {activeVariant.name}
+                          </span>
+                          <span className="text-[10px] uppercase tracking-wider text-gold-400/90 font-serif">
+                            2 Vistas
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-1.5" role="group" aria-label={`Vistas de ${product.name}`}>
+                          {product.gallery.map((img) => {
+                            const isCurrentView = activeImage.id === img.id;
+                            return (
+                              <button
+                                key={img.id}
+                                type="button"
+                                onClick={() => handleGalleryImageSelect(product, img)}
+                                className={`px-2.5 py-1.5 rounded text-xs border transition-all flex items-center justify-between ${
+                                  isCurrentView
+                                    ? "bg-gold-500/15 border-gold-500/60 text-celestial-ivory"
+                                    : "bg-obsidian-850 border-obsidian-700 text-celestial-silver hover:border-obsidian-600"
+                                }`}
+                              >
+                                <span className="truncate">{img.label}</span>
+                                {isCurrentView && (
+                                  <Check className="w-3.5 h-3.5 text-gold-400 flex-shrink-0 ml-1" />
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* PRECIO Y ACCIÓN */}
@@ -393,13 +604,26 @@ export default function StoreFrontDemoPage() {
                       </span>
                     </div>
 
-                    <button
-                      onClick={() => handleAddToCart(product)}
-                      className="px-3.5 py-2 rounded-lg bg-gold-500 hover:bg-gold-400 text-obsidian-950 font-medium text-xs tracking-wider uppercase flex items-center gap-1.5 transition-all shadow-sm hover:shadow-gold-glow"
-                    >
-                      <ShoppingBag className="w-3.5 h-3.5" />
-                      <span>Agregar</span>
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenDetail(product)}
+                        className="px-2.5 py-2 rounded-lg bg-obsidian-700/80 hover:bg-obsidian-700 text-celestial-silver hover:text-celestial-ivory border border-obsidian-600 text-xs transition-all"
+                        aria-label={`Ver detalle de ${product.name}`}
+                        title="Ver galería y especificaciones"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleAddToCart(product)}
+                        className="px-3.5 py-2 rounded-lg bg-gold-500 hover:bg-gold-400 text-obsidian-950 font-medium text-xs tracking-wider uppercase flex items-center gap-1.5 transition-all shadow-sm hover:shadow-gold-glow"
+                      >
+                        <ShoppingBag className="w-3.5 h-3.5" />
+                        <span>Agregar</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -407,6 +631,295 @@ export default function StoreFrontDemoPage() {
           })}
         </div>
       </main>
+
+      {/* ---------------------------------------------------------------------- */}
+      {/* VISTA DE DETALLE Y GALERÍA DE PRODUCTO (MODAL INTERACTIVO ACCESIBLE) */}
+      {/* ---------------------------------------------------------------------- */}
+      {detailProduct && (() => {
+        const activeVariantId =
+          selectedVariants[detailProduct.id] || detailProduct.variants[0].id;
+        const activeVariant =
+          detailProduct.variants.find((v) => v.id === activeVariantId) ||
+          detailProduct.variants[0];
+        const activeImage = resolveActiveProductImage(detailProduct, activeVariant);
+        const currentImgIndex = detailProduct.gallery.findIndex(
+          (img) => img.id === activeImage.id
+        );
+        const hasDetailImageError = Boolean(failedImages[activeImage.url]);
+
+        const goPrevImage = () => {
+          const prevIdx =
+            (currentImgIndex - 1 + detailProduct.gallery.length) %
+            detailProduct.gallery.length;
+          handleGalleryImageSelect(detailProduct, detailProduct.gallery[prevIdx]);
+        };
+
+        const goNextImage = () => {
+          const nextIdx = (currentImgIndex + 1) % detailProduct.gallery.length;
+          handleGalleryImageSelect(detailProduct, detailProduct.gallery[nextIdx]);
+        };
+
+        return (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-obsidian-950/85 backdrop-blur-md animate-in fade-in overflow-y-auto"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="detail-product-title"
+            onClick={() => setDetailProductId(null)}
+          >
+            <div
+              className="relative w-full max-w-4xl bg-obsidian-900 border border-obsidian-600 rounded-2xl shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col md:flex-row"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Botón cerrar superior derecho */}
+              <button
+                type="button"
+                onClick={() => setDetailProductId(null)}
+                className="absolute top-3.5 right-3.5 z-20 p-2 rounded-full bg-obsidian-950/85 hover:bg-obsidian-800 text-celestial-silver hover:text-celestial-ivory border border-obsidian-600 transition-colors"
+                aria-label="Cerrar galería de producto"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              {/* COLUMNA IZQUIERDA: GALERÍA VISUAL CON MINIATURAS */}
+              <div className="w-full md:w-1/2 bg-obsidian-950 border-b md:border-b-0 md:border-r border-obsidian-700/70 p-4 sm:p-6 flex flex-col justify-between select-none">
+                {/* Visor de imagen principal */}
+                <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-obsidian-900/60 border border-obsidian-800 flex items-center justify-center">
+                  {!hasDetailImageError ? (
+                    <Image
+                      key={activeImage.url}
+                      src={activeImage.url}
+                      alt={activeImage.alt}
+                      fill
+                      sizes="(max-width: 768px) 92vw, 440px"
+                      priority
+                      onError={() =>
+                        setFailedImages((prev) => ({
+                          ...prev,
+                          [activeImage.url]: true,
+                        }))
+                      }
+                      className="object-contain p-2"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center p-6 text-center">
+                      <Image
+                        src="/brand/logo_only.png"
+                        alt="Símbolo Duality Rol"
+                        width={64}
+                        height={64}
+                        className="object-contain opacity-75"
+                      />
+                      <span className="mt-3 text-xs font-serif text-celestial-silver">
+                        {activeImage.label}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Controles Anterior / Siguiente para navegar cómodamente en móvil y escritorio */}
+                  {detailProduct.gallery.length > 1 && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={goPrevImage}
+                        className="absolute left-2.5 top-1/2 -translate-y-1/2 p-2 rounded-full bg-obsidian-950/85 hover:bg-obsidian-800 text-celestial-ivory border border-obsidian-600 hover:border-gold-500/50 transition-all shadow-md"
+                        aria-label="Imagen anterior"
+                      >
+                        <ChevronLeft className="w-4 h-4 text-gold-400" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={goNextImage}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2 rounded-full bg-obsidian-950/85 hover:bg-obsidian-800 text-celestial-ivory border border-obsidian-600 hover:border-gold-500/50 transition-all shadow-md"
+                        aria-label="Siguiente imagen"
+                      >
+                        <ChevronRight className="w-4 h-4 text-gold-400" />
+                      </button>
+                    </>
+                  )}
+
+                  {/* Etiqueta de la vista o acabado actualmente visible */}
+                  <div className="absolute bottom-2.5 inset-x-2.5 flex items-center justify-between px-3 py-1.5 rounded-lg bg-obsidian-950/85 border border-obsidian-700/80 backdrop-blur-md text-[11px]">
+                    <span className="text-celestial-ivory font-medium truncate">
+                      {activeImage.label}
+                    </span>
+                    <span className="text-gold-400 font-mono text-[10px] ml-2 flex-shrink-0">
+                      {currentImgIndex + 1} / {detailProduct.gallery.length}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Tira de miniaturas seleccionables */}
+                <div className="mt-4">
+                  <span className="text-[10px] uppercase tracking-widest text-celestial-muted block mb-2">
+                    {detailProduct.variants.length > 1
+                      ? "Miniaturas por variante (clic o flechas ← →):"
+                      : "Vistas del artículo (clic o flechas ← →):"}
+                  </span>
+                  <div className="grid grid-cols-2 gap-3">
+                    {detailProduct.gallery.map((img) => {
+                      const isSelectedImg = activeImage.id === img.id;
+                      const thumbError = Boolean(failedImages[img.url]);
+                      return (
+                        <button
+                          key={img.id}
+                          type="button"
+                          onClick={() => handleGalleryImageSelect(detailProduct, img)}
+                          className={`group/thumb relative flex items-center gap-2.5 p-2 rounded-lg border text-left transition-all ${
+                            isSelectedImg
+                              ? "bg-gold-500/15 border-gold-500 text-celestial-ivory shadow-gold-glow"
+                              : "bg-obsidian-900 border-obsidian-700 text-celestial-silver hover:border-obsidian-500"
+                          }`}
+                          aria-label={`Seleccionar imagen: ${img.label}`}
+                          aria-pressed={isSelectedImg}
+                        >
+                          <div className="relative w-12 h-12 rounded-md overflow-hidden bg-obsidian-950 border border-obsidian-700 flex-shrink-0">
+                            {!thumbError ? (
+                              <Image
+                                src={img.url}
+                                alt={img.alt}
+                                fill
+                                sizes="48px"
+                                onError={() =>
+                                  setFailedImages((prev) => ({
+                                    ...prev,
+                                    [img.url]: true,
+                                  }))
+                                }
+                                className="object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <Sparkles className="w-4 h-4 text-gold-400/60" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <span className="block text-[11px] font-medium leading-tight truncate">
+                              {img.label}
+                            </span>
+                            <span className="block text-[10px] text-celestial-muted mt-0.5">
+                              {img.variantId ? "Acabado" : "Vista de galería"}
+                            </span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* COLUMNA DERECHA: INFORMACIÓN COMERCIAL, SELECTOR DE VARIANTES Y COMPRA */}
+              <div className="w-full md:w-1/2 p-5 sm:p-7 flex flex-col justify-between overflow-y-auto">
+                <div>
+                  <div className="flex flex-wrap items-center gap-2 mb-3 pr-8">
+                    <span className="text-[11px] uppercase tracking-widest text-gold-400 font-serif">
+                      {detailProduct.categoryName}
+                    </span>
+                    <span className="text-obsidian-600">•</span>
+                    <span className="text-[11px] font-mono text-celestial-silver">
+                      SKU: {activeVariant.sku}
+                    </span>
+                  </div>
+
+                  <h2
+                    id="detail-product-title"
+                    className="text-xl sm:text-2xl font-serif tracking-wide text-celestial-ivory"
+                  >
+                    {detailProduct.name}
+                  </h2>
+
+                  <div className="mt-3 flex items-center gap-3">
+                    <span className="text-2xl font-serif text-gold-300 font-semibold">
+                      ${activeVariant.priceArs.toLocaleString("es-AR")} ARS
+                    </span>
+                    <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-obsidian-800 border border-obsidian-600">
+                      {activeVariant.stock > 0 ? (
+                        <span className="text-emerald-400">
+                          Disponible ({activeVariant.stock} u.)
+                        </span>
+                      ) : (
+                        <span className="text-rose-400">Agotado</span>
+                      )}
+                    </span>
+                  </div>
+
+                  <p className="mt-4 text-xs sm:text-sm text-celestial-silver font-light leading-relaxed">
+                    {detailProduct.description}
+                  </p>
+
+                  {/* Selector de variantes sincronizado con la galería */}
+                  <div className="mt-5">
+                    <label className="text-[11px] uppercase tracking-wider text-celestial-muted block mb-2 font-medium">
+                      {detailProduct.variants.length > 1
+                        ? "Seleccionar Variante / Acabado:"
+                        : "Especificación de Pieza (Única variante):"}
+                    </label>
+                    <div className="grid grid-cols-1 gap-2">
+                      {detailProduct.variants.map((v) => (
+                        <button
+                          key={v.id}
+                          type="button"
+                          onClick={() => handleVariantChange(detailProduct.id, v.id)}
+                          className={`text-left px-3.5 py-2.5 rounded-lg text-xs border transition-all flex items-center justify-between ${
+                            activeVariant.id === v.id
+                              ? "bg-gold-500/15 border-gold-500 text-celestial-ivory shadow-gold-glow"
+                              : "bg-obsidian-850 border-obsidian-700 text-celestial-silver hover:border-obsidian-500"
+                          }`}
+                        >
+                          <div>
+                            <span className="font-medium block">{v.name}</span>
+                            <span className="text-[10px] font-mono text-celestial-muted">
+                              SKU: {v.sku} · Stock: {v.stock}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-serif text-gold-300 font-semibold">
+                              ${v.priceArs.toLocaleString("es-AR")}
+                            </span>
+                            {activeVariant.id === v.id && (
+                              <Check className="w-4 h-4 text-gold-400" />
+                            )}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Características destacadas */}
+                  <div className="mt-5 pt-4 border-t border-obsidian-700/60">
+                    <span className="text-[11px] uppercase tracking-wider text-celestial-muted block mb-2 font-medium">
+                      Características de la pieza:
+                    </span>
+                    <ul className="space-y-1.5 text-xs text-celestial-silver">
+                      {detailProduct.features.map((feat, i) => (
+                        <li key={i} className="flex items-center gap-2">
+                          <Sparkles className="w-3 h-3 text-gold-400 flex-shrink-0" />
+                          <span>{feat}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Botón de compra en modal */}
+                <div className="mt-6 pt-4 border-t border-obsidian-700 flex items-center justify-between gap-3">
+                  <button
+                    type="button"
+                    onClick={() => handleAddToCart(detailProduct)}
+                    className="w-full py-3 px-4 rounded-lg bg-gold-500 hover:bg-gold-400 text-obsidian-950 font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-gold-glow"
+                  >
+                    <ShoppingBag className="w-4 h-4" />
+                    <span>
+                      Agregar al Carrito — ${activeVariant.priceArs.toLocaleString("es-AR")}
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ---------------------------------------------------------------------- */}
       {/* MODAL / DRAWER DEL CARRITO DEMOSTRATIVO */}
@@ -425,6 +938,7 @@ export default function StoreFrontDemoPage() {
               <button
                 onClick={() => setIsCartOpen(false)}
                 className="p-1 rounded-md text-celestial-silver hover:text-celestial-ivory hover:bg-obsidian-800"
+                aria-label="Cerrar carrito"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -445,24 +959,38 @@ export default function StoreFrontDemoPage() {
                   </p>
                 </div>
               ) : (
-                cart.map((item, index) => (
-                  <div key={index} className="py-4 first:pt-0 last:pb-0 flex items-start justify-between gap-3">
-                    <div>
-                      <h4 className="text-sm font-medium text-celestial-ivory">
-                        {item.product.name}
-                      </h4>
-                      <p className="text-xs text-gold-400/90 font-mono mt-0.5">
-                        Variante: {item.variant.name}
-                      </p>
-                      <p className="text-xs text-celestial-silver mt-1">
-                        Cantidad: {item.quantity} × ${item.variant.priceArs.toLocaleString("es-AR")}
-                      </p>
+                cart.map((item, index) => {
+                  const itemImage = item.variant.image || item.product.mainImage;
+                  return (
+                    <div key={index} className="py-4 first:pt-0 last:pb-0 flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-3">
+                        <div className="relative w-12 h-12 rounded-md overflow-hidden bg-obsidian-950 border border-obsidian-700 flex-shrink-0">
+                          <Image
+                            src={itemImage}
+                            alt={`${item.product.name} — ${item.variant.name}`}
+                            fill
+                            sizes="48px"
+                            className="object-cover"
+                          />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-medium text-celestial-ivory">
+                            {item.product.name}
+                          </h4>
+                          <p className="text-xs text-gold-400/90 font-mono mt-0.5">
+                            Variante: {item.variant.name}
+                          </p>
+                          <p className="text-xs text-celestial-silver mt-1">
+                            Cantidad: {item.quantity} × ${item.variant.priceArs.toLocaleString("es-AR")}
+                          </p>
+                        </div>
+                      </div>
+                      <span className="font-serif text-sm text-gold-300 font-semibold flex-shrink-0">
+                        ${(item.variant.priceArs * item.quantity).toLocaleString("es-AR")}
+                      </span>
                     </div>
-                    <span className="font-serif text-sm text-gold-300 font-semibold">
-                      ${(item.variant.priceArs * item.quantity).toLocaleString("es-AR")}
-                    </span>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
 
