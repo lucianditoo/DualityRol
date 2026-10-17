@@ -79,13 +79,16 @@ export type CategoryInput = z.infer<typeof CategorySchema>;
 
 export const ProductVariantSchema = z.object({
   id: z.string().cuid().optional(),
-  name: z.string().min(1, "El nombre de la variante es obligatorio").max(100),
-  sku: z.string().min(3, "El SKU debe tener al menos 3 caracteres").max(50),
-  priceAdjustmentArs: z
-    .number()
-    .min(0, "El ajuste de precio no puede ser negativo")
-    .default(0),
-  stock: z.number().int().min(0, "El stock no puede ser negativo").default(0),
+  name: z.string().min(1, "El nombre de la variante es obligatorio").max(100).trim(),
+  sku: z
+    .string()
+    .min(3, "El SKU debe tener al menos 3 caracteres")
+    .max(50, "El SKU no puede superar los 50 caracteres")
+    .trim()
+    .toUpperCase()
+    .regex(/^[A-Z0-9_-]+$/, "El SKU solo admite letras mayúsculas, números, guiones y guiones bajos"),
+  priceAdjustmentArs: z.number().default(0),
+  stock: z.number().int("El stock debe ser un número entero").min(0, "El stock no puede ser negativo").default(0),
   isActive: z.boolean().default(true),
 });
 export type ProductVariantInput = z.infer<typeof ProductVariantSchema>;
@@ -101,22 +104,46 @@ export const ProductImageSchema = z.object({
 });
 export type ProductImageInput = z.infer<typeof ProductImageSchema>;
 
-export const ProductSchema = z.object({
-  id: z.string().cuid().optional(),
-  name: z.string().min(2, "El nombre debe tener al menos 2 caracteres").max(120),
-  slug: z
-    .string()
-    .min(2)
-    .max(130)
-    .regex(/^[a-z0-9-]+$/, "El slug solo debe contener minúsculas, números y guiones"),
-  description: z.string().min(5, "La descripción debe tener al menos 5 caracteres"),
-  basePriceArs: z.number().min(1, "El precio base debe ser mayor a 0"),
-  isSelfMade: z.boolean().default(false), // true: Impresión 3D propia, false: Reventa
-  isDualityCreation: z.boolean().default(false), // Insignia visual destacada «Creación Duality»
-  isActive: z.boolean().default(true),
-  categoryId: z.string().cuid("ID de categoría no válido"),
-  variants: z.array(ProductVariantSchema).min(1, "Debe tener al menos una variante"),
-});
+export const ProductSchema = z
+  .object({
+    id: z.string().cuid().optional(),
+    name: z.string().min(2, "El nombre debe tener al menos 2 caracteres").max(120).trim(),
+    slug: z
+      .string()
+      .min(2, "El slug debe tener al menos 2 caracteres")
+      .max(130)
+      .trim()
+      .toLowerCase()
+      .regex(/^[a-z0-9-]+$/, "El slug solo debe contener minúsculas, números y guiones"),
+    description: z.string().min(5, "La descripción debe tener al menos 5 caracteres").trim(),
+    basePriceArs: z.number().min(1, "El precio base debe ser mayor a 0"),
+    isSelfMade: z.boolean().default(false), // true: Impresión 3D propia, false: Reventa
+    isDualityCreation: z.boolean().default(false), // Insignia visual destacada «Creación Duality»
+    isActive: z.boolean().default(true),
+    categoryId: z.string().cuid("Debés seleccionar una categoría válida"),
+    variants: z.array(ProductVariantSchema).min(1, "El producto debe tener al menos una variante"),
+  })
+  .superRefine((data, ctx) => {
+    const skus = new Set<string>();
+    data.variants.forEach((v, idx) => {
+      const finalPrice = data.basePriceArs + v.priceAdjustmentArs;
+      if (finalPrice <= 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `El precio final de la variante "${v.name}" ($${finalPrice}) debe ser mayor a $0 ARS`,
+          path: ["variants", idx, "priceAdjustmentArs"],
+        });
+      }
+      if (skus.has(v.sku)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `El SKU "${v.sku}" está repetido dentro del mismo producto`,
+          path: ["variants", idx, "sku"],
+        });
+      }
+      skus.add(v.sku);
+    });
+  });
 export type ProductInput = z.infer<typeof ProductSchema>;
 
 // ============================================================================
