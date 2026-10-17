@@ -245,19 +245,50 @@ model PaymentTransaction {
 // ----------------------------------------------------------------------------
 
 model AdminUser {
-  id           String     @id @default(cuid())
-  email        String     @unique @db.VarChar(120)
-  passwordHash String     @db.VarChar(255)
-  role         AdminRole  @default(OPERATOR)
-  isActive     Boolean    @default(true)
+  id           String         @id @default(cuid())
+  email        String         @unique @db.VarChar(120)
+  passwordHash String         @db.VarChar(255)
+  role         AdminRole      @default(OPERATOR)
+  isActive     Boolean        @default(true)
   lastLoginAt  DateTime?
 
+  sessions     AdminSession[]
   auditLogs    AuditLog[]
+
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@index([email])
+}
+
+model AdminSession {
+  id           String     @id @default(cuid())
+  tokenHash    String     @unique @db.VarChar(64) // SHA-256 del token opaco de sesión
+  adminUserId  String
+  adminUser    AdminUser  @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+  
+  ipAddress    String?    @db.VarChar(50)
+  userAgent    String?    @db.VarChar(300)
+  expiresAt    DateTime
+  revokedAt    DateTime?  // Fecha de revocación si fue invalidada manualmente
 
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
-  @@index([email])
+  @@index([tokenHash])
+  @@index([adminUserId])
+  @@index([expiresAt])
+}
+
+model LoginAttempt {
+  id          String    @id @default(cuid())
+  ipAddress   String    @db.VarChar(50)
+  email       String    @db.VarChar(120)
+  success     Boolean   @default(false)
+  attemptedAt DateTime  @default(now())
+
+  @@index([ipAddress, attemptedAt])
+  @@index([email, attemptedAt])
 }
 
 model AuditLog {
